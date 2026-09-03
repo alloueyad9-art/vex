@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEX — Sales System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Space Grotesk',sans-serif;background:#0A0A0A;color:#fff;padding:40px 20px;min-height:100vh}
+        .header{text-align:center;margin-bottom:40px}
+        .header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#C9A84C,#E8D48B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+        .header p{color:rgba(255,255,255,.35);font-size:.85rem;max-width:600px;margin:0 auto;line-height:1.6}
+        .tabs{display:flex;gap:8px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+        .tab{padding:8px 20px;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:.72rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s;letter-spacing:.05em}
+        .tab:hover,.tab.active{background:#C9A84C;color:#0A0A0A;border-color:#C9A84C}
+        .tab.yes{border-color:rgba(34,197,94,.3);color:rgba(34,197,94,.6)}
+        .tab.yes:hover,.tab.yes.active{background:#22C55E;color:#fff;border-color:#22C55E}
+        .tab.no{border-color:rgba(239,68,68,.3);color:rgba(239,68,68,.6)}
+        .tab.no:hover,.tab.no.active{background:#EF4444;color:#fff;border-color:#EF4444}
+        .tab.follow{border-color:rgba(251,191,36,.3);color:rgba(251,191,36,.6)}
+        .tab.follow:hover,.tab.follow.active{background:#FBBF24;color:#0A0A0A;border-color:#FBBF24}
+        .pitch-grid{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+        .pitch-card{background:#111;border:1px solid rgba(255,255,255,.06);padding:24px;transition:all .3s}
+        .pitch-card:hover{border-color:rgba(201,168,76,.2)}
+        .pitch-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+        .pitch-name{font-weight:600;font-size:1rem;color:#fff}
+        .pitch-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        .pitch-tag{display:inline-block;padding:3px 10px;font-size:.6rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border-radius:2px}
+        .tag-cat{background:rgba(201,168,76,.08);color:#C9A84C;border:1px solid rgba(201,168,76,.15)}
+        .tag-priority{background:rgba(239,68,68,.1);color:#EF4444;border:1px solid rgba(239,68,68,.2)}
+        .tag-yes{background:rgba(34,197,94,.1);color:#22C55E;border:1px solid rgba(34,197,94,.2)}
+        .tag-no{background:rgba(239,68,68,.1);color:#EF4444;border:1px solid rgba(239,68,68,.2)}
+        .tag-follow{background:rgba(251,191,36,.1);color:#FBBF24;border:1px solid rgba(251,191,36,.2)}
+        .tag-step{background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08)}
+        .pitch-phone{font-size:.75rem;color:#C9A84C}
+        .pitch-text{background:#0A0A0A;border:1px solid rgba(255,255,255,.04);padding:16px;font-size:.85rem;line-height:2;color:rgba(255,255,255,.8);white-space:pre-wrap}
+        .pitch-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+        .btn-copy{padding:8px 18px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:#C9A84C;font-size:.72rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s}
+        .btn-copy:hover{background:#C9A84C;color:#0A0A0A}
+        .btn-copy.copied{background:#22C55E;border-color:#22C55E;color:#fff}
+        .btn-wa{padding:8px 18px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#25D366;font-size:.72rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s;text-decoration:none}
+        .btn-wa:hover{background:#25D366;color:#fff}
+        .flow-box{max-width:900px;margin:30px auto;padding:24px;background:#111;border:1px solid rgba(255,255,255,.06)}
+        .flow-box h2{font-size:1.1rem;color:#C9A84C;margin-bottom:16px}
+        .flow-steps{display:flex;gap:12px;align-items:start;flex-wrap:wrap}
+        .flow-step{flex:1;min-width:150px;text-align:center}
+        .flow-step .num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;margin:0 auto 8px}
+        .flow-step .label{font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.05em}
+        .arrow{color:rgba(255,255,255,.15);font-size:1.2rem;padding-top:6px}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VEX Sales System</h1>
+        <p>Step 1: Send the pitch. Step 2: They reply YES or NO. Step 3: You know exactly what to say.</p>
+    </div>
+
+    <div class="flow-box">
+        <h2>The Sales Flow</h2>
+        <div class="flow-steps">
+            <div class="flow-step"><div class="num" style="background:rgba(201,168,76,.15);color:#C9A84C">1</div><div class="label">Send Pitch</div></div>
+            <div class="arrow">→</div>
+            <div class="flow-step"><div class="num" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)">2</div><div class="label">They Reply</div></div>
+            <div class="arrow">→</div>
+            <div class="flow-step"><div class="num" style="background:rgba(34,197,94,.15);color:#22C55E">3</div><div class="label">YES → Close</div></div>
+            <div class="arrow">→</div>
+            <div class="flow-step"><div class="num" style="background:rgba(239,68,68,.15);color:#EF4444">4</div><div class="label">NO → Overcome</div></div>
+            <div class="arrow">→</div>
+            <div class="flow-step"><div class="num" style="background:rgba(251,191,36,.15);color:#FBBF24">5</div><div class="label">Follow Up</div></div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="filterAll()">All</button>
+        <button class="tab" onclick="filterType('pitch')">📩 Opening Pitches</button>
+        <button class="tab yes" onclick="filterType('yes')">✅ They Said YES</button>
+        <button class="tab no" onclick="filterType('no')">❌ They Said NO</button>
+        <button class="tab follow" onclick="filterType('follow')">🔄 Follow-Ups</button>
+    </div>
+
+    <div class="pitch-grid" id="pitches"></div>
+
+<script>
+const pitches = [
+// ==========================================
+// STEP 1: OPENING PITCHES (Ultra Interesting)
+// ==========================================
+{name:"LAUNCH PITCH — Law Firm",cat:"legal",phone:"+213 662 461 089",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Maitre,
+
+Quick question — how many clients do you lose every month because they can't find you on Google?
+
+I built a website for a lawyer in Algiers last month. Within 2 weeks, he got 4 new clients from Google alone. That's 4 clients he was losing before.
+
+Your firm doesn't have a website right now. That means every time someone searches "avocat Mohammadia" — they find your competitors, not you.
+
+I can fix that in 7 days.
+
+Here's what you get:
+→ Premium website that looks like a 700,000 DA site
+→ Google ranking — people find you when they search
+→ Contact form — clients message you directly
+→ Google Maps — people find your office
+→ Mobile-friendly — works on phones
+
+Price: 200,000 DA. That's less than what 1 client brings you.
+
+Want me to show you what your site could look like? I can make a free mockup — no commitment.`},
+
+{name:"LAUNCH PITCH — Restaurant",cat:"food",phone:"0541 751 124",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi La Broche,
+
+I just saw you're rated 5/5 on Tripadvisor — you're literally the best restaurant in Bordj El Kiffan. Congratulations!
+
+But here's the thing — you're invisible on Google. When someone types "best restaurant Bordj El Kiffan" on Google, you don't show up. They go to a competitor.
+
+That's like having the best food in town but no sign on the door.
+
+I can fix that in 7 days:
+→ Website with your menu + beautiful food photos
+→ Google Maps so people find you
+→ Online reservations — people book without calling
+→ Customer reviews displayed — social proof
+→ Mobile-friendly — works on phones
+
+Price: 200,000 DA. That's less than what you make in one busy night.
+
+Want me to show you what your site could look like? Free mockup — no commitment.`},
+
+{name:"LAUNCH PITCH — Hotel",cat:"hotel",phone:"",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi,
+
+I have a quick question — do you know how many travelers search "hotel Bordj El Kiffan" on Google every month?
+
+Here's the answer: hundreds. And right now, they can't find you. They go to Booking.com instead, and you pay commission for every booking.
+
+What if you had your own website where people could:
+→ See your rooms + prices + beautiful photos
+→ Book directly — no commission
+→ Read reviews from other guests
+→ Find you on Google Maps
+
+That's exactly what I build. 200,000 DA — and it pays for itself in the first month because you stop paying commission to Booking.com.
+
+Want me to show you? Free mockup — no commitment.`},
+
+{name:"LAUNCH PITCH — Medical",cat:"medical",phone:"+213 238 208 31",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Docteur,
+
+I have a question — when parents need a pediatrician, what do they do? They Google it.
+
+Right now, when someone types "pediatre Mohammadia" on Google, you don't show up. They find someone else.
+
+That's patients you're losing every single day.
+
+I can fix that in 7 days:
+→ Professional medical website
+→ Your specialties + diplomas displayed
+→ Online appointment booking — patients book without calling
+→ Google ranking — people find you when they search
+→ Reviews from happy parents
+
+Price: 200,000 DA. That's one consultation. One. And the website brings you patients for years.
+
+Want me to show you what your site could look like? Free mockup.`},
+
+{name:"LAUNCH PITCH — Retail/Showroom",cat:"retail",phone:"0770 074 520",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Mersa Trade,
+
+Quick question — when someone in Les Pins wants to buy electronics, where do they go? Google.
+
+They type "electronique Les Pins" and what comes up? Your competitors with websites. Not you.
+
+You have a great store but no online presence. That's like having a shop with the lights off.
+
+I can fix that in 7 days:
+→ Website with your product catalog
+→ Prices displayed — customers know before they come
+→ HD photos of your products
+→ Google Maps — people find your store
+→ Contact + WhatsApp button
+
+Price: 200,000 DA. That's less than what you make selling 10 products.
+
+Want me to show you what your site could look like? Free mockup — no commitment.`},
+
+{name:"LAUNCH PITCH — Cafe",cat:"food",phone:"+213 560 123 994",priority:"med",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi FIKA,
+
+I love your Instagram — the cafe looks amazing!
+
+But here's the problem: Instagram doesn't show up on Google. When someone searches "cafe Mohammadia" — you're invisible.
+
+I can fix that in 5 days:
+→ Website with your full drink menu
+→ Photos of your space + drinks
+→ Location + hours
+→ Instagram + social links
+→ Google Maps
+
+Price: 200,000 DA. A cafe with a website gets way more walk-ins.
+
+Want me to show you? Free mockup.`},
+
+{name:"LAUNCH PITCH — Tech Company",cat:"services",phone:"",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Creativa,
+
+You're a tech company — but you don't have a website. Just a Facebook page.
+
+Think about that for a second. A business that helps OTHER companies go digital... doesn't have its own website.
+
+When a potential client searches for IT services in Mohammadia, they find your competitors. Not you. Because they have websites and you don't.
+
+I can fix that in 7 days:
+→ Professional tech company website
+→ Your services + portfolio
+→ Technologies you work with
+→ Contact + quote form
+→ Google ranking
+
+Price: 200,000 DA. It's embarrassing for a tech company to not have a site. Let's fix that.
+
+Want me to show you? Free mockup.`},
+
+{name:"LAUNCH PITCH — Kitchen Showroom",cat:"retail",phone:"0552 065 682",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Dimachki,
+
+Your kitchen showroom on Instagram looks incredible!
+
+But Instagram doesn't let people browse properly. Customers want to see ALL your models, compare prices, request quotes — on their own time, from their phone.
+
+I can build you a catalog website in 7 days:
+→ Every kitchen model displayed with photos
+→ Prices + customization options
+→ "Request a free quote" button — leads come to you
+→ Google ranking — people find you when they search "cuisine Alger"
+→ Instagram integration
+
+Price: 200,000 DA. A kitchen showroom with a website gets 3x more quote requests. That's proven.
+
+Want me to show you? Free mockup.`},
+
+{name:"LAUNCH PITCH — Notaire",cat:"legal",phone:"+213 238 213 15",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Maitre,
+
+When someone needs a notaire, what do they do? They Google "notaire Mohammadia."
+
+Right now, you don't exist on Google. That means every time someone needs a notaire — they find your competitors.
+
+A notaire without a website is like a doctor without a clinic. People don't trust what they can't see.
+
+I can fix that in 7 days:
+→ Professional website that looks trustworthy
+→ All your services listed
+→ Contact + hours + Google Maps
+→ Online consultation form
+
+Price: 200,000 DA. One client pays for the whole site.
+
+Want me to show you? Free mockup.`},
+
+{name:"LAUNCH PITCH — B2B Equipment",cat:"retail",phone:"0550 788 799",priority:"high",type:"pitch",
+step:"STEP 1 — Send this first",
+text:`Hi Bylam,
+
+You sell equipment to businesses — but your online presence is just Facebook.
+
+Here's the truth: when a company wants to buy equipment, they Google it first. They compare 3-4 suppliers. The ones with professional websites get the call. The ones without? Ignored.
+
+A website isn't just a page — it's credibility. It tells businesses "we're real, we're professional, you can trust us."
+
+I can build you:
+→ Professional B2B website
+→ Equipment catalog with specs
+→ "Request a quote" form
+→ Certifications + about section
+→ Google ranking
+
+Price: 200,000 DA. One B2B deal pays for this 10x over.
+
+Want me to show you? Free mockup.`},
+
+// ==========================================
+// STEP 2: IF THEY SAY YES
+// ==========================================
+{name:"They said YES — What's next",cat:"universal",phone:"",priority:"high",type:"yes",
+step:"STEP 2 — Send this after they say yes",
+text:`Awesome! Let me get started.
+
+Quick questions:
+1. What's your business name exactly?
+2. What's your address?
+3. What services/products do you want featured?
+4. Do you have a logo? If not, I'll make one.
+5. Any specific colors or style you like?
+
+I'll have your mockup ready in 24 hours — completely free. You can show it to anyone before deciding.
+
+Let's go! 🚀`},
+
+{name:"You sent the mockup — close the deal",cat:"universal",phone:"",priority:"high",type:"yes",
+step:"STEP 2 — Send after showing mockup",
+text:`Here's your mockup! 👆
+
+This is what your website will look like. Pretty good, right?
+
+If you like it, here's how we move forward:
+→ You pay 50% now (100,000 DA)
+→ I build the full site in 7 days
+→ You pay the rest when it's done
+
+Payment: CCP/Baridimob or cash.
+
+I have 3 spots left this month. Once they're filled, the next available slot is next month.
+
+Want to lock yours in?`},
+
+{name:"They ask about price — Value pitch",cat:"universal",phone:"",priority:"high",type:"yes",
+step:"STEP 2 — If they ask "how much"",
+text:`200,000 DA for the full website. Here's what that includes:
+
+→ Custom design (not a template)
+→ Mobile-friendly (works on phones)
+→ Google ranking setup
+→ Contact form
+→ Google Maps integration
+→ Hosting for 1 year included
+→ 30 days of free support
+
+Think about it this way:
+→ If you're a lawyer: 1 new client = 200,000 DA. The site pays for itself in 1 client.
+→ If you're a restaurant: 1 busy night = 200,000 DA. The site pays for itself in 1 night.
+→ If you're a hotel: 1 booking = 200,000 DA. The site pays for itself in 1 booking.
+
+It's not a cost — it's an investment that pays for itself.
+
+Ready to start?`},
+
+{name:"They ask "why do I need this"",cat:"universal",phone:"",priority:"high",type:"yes",
+step:"STEP 2 — If they ask "why"",
+text:`Here's the reality:
+
+→ 81% of people search online before visiting a business
+→ 75% of people judge a business by its website
+→ Businesses with websites get 2x more customers
+
+Without a website:
+→ You're invisible on Google
+→ People can't find your address or phone
+→ You look less professional than competitors
+→ You lose customers every single day
+
+With a website:
+→ People find you when they search
+→ You look professional and trustworthy
+→ Customers can contact you easily
+→ You get more business 24/7
+
+200,000 DA is nothing compared to what you're losing right now.
+
+Ready to start?`},
+
+{name:"They ask "can you do it cheaper"",cat:"universal",phone:"",priority:"high",type:"yes",
+step:"STEP 2 — If they negotiate price",
+text:`I hear you. Here's what I can do:
+
+Option 1: Full website — 200,000 DA (best value)
+Option 2: Payment plan — 70,000 DA/mois for 8 months (375 upfront + 4 monthly payments)
+
+Both get you the exact same website. The payment plan just spreads it out.
+
+Here's the thing: every month you don't have a website, you lose customers. The sooner we start, the sooner it pays for itself.
+
+Which option works for you?`},
+
+{name:"They ask "how long does it take"",cat:"universal",phone:"",priority:"high",type:"yes",
+step:"STEP 2 — If they ask timeline",
+text:`7 days. That's it.
+
+Here's the timeline:
+→ Day 1: You send me your info (name, address, services, photos)
+→ Day 2-3: I design your website
+→ Day 4-5: I build it + add all content
+→ Day 6: You review + request changes
+→ Day 7: It goes live on Google
+
+You'll have a professional website in exactly 7 days.
+
+Ready to start?`},
+
+// ==========================================
+// STEP 3: IF THEY SAY NO
+// ==========================================
+{name:"They say NO — Too expensive",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "too expensive"",
+text:`I totally understand. Let me ask you something:
+
+How much do you lose every month by NOT having a website?
+
+→ If you're a lawyer losing 2 clients/month = 200,000+ DA lost
+→ If you're a restaurant losing 10 customers/night = 300,000+ DA lost
+→ If you're a hotel losing 5 bookings/month = 400,000+ DA lost
+
+The website costs 200,000 DA ONCE. It brings you customers FOREVER.
+
+It's not an expense — it's the cheapest investment you'll ever make.
+
+But if you're not ready, I understand. Can I check back in a month?`},
+
+{name:"They say NO — I don't need one",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "I don't need it"",
+text:`I respect that. But let me show you something:
+
+→ Google "avocat Mohammadia" — how many show up with websites?
+→ Google "restaurant Bordj El Kiffan" — who's on top?
+→ Google "hotel Mohammadia" — who gets the clicks?
+
+The businesses with websites get the customers. The ones without? Invisible.
+
+You don't need a website IF you have more clients than you can handle. But most businesses don't.
+
+Can I send you a free mockup just so you can see what it looks like? No commitment.`},
+
+{name:"They say NO — I use Facebook",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "I use Facebook"",
+text:`Facebook is great for engagement — but it's not a website.
+
+Here's the difference:
+→ Facebook: Only people who already follow you see your posts
+→ Website: EVERYONE who searches Google finds you
+
+Facebook doesn't show up on Google. A website does.
+
+Think of it this way: Facebook is like a party invitation. A website is like a billboard on the highway. Which one reaches more people?
+
+Can I show you what a website would look like for your business? Free mockup.`},
+
+{name:"They say NO — Not now, maybe later",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "maybe later"",
+text:`No problem at all. But here's something to think about:
+
+Every month without a website = customers going to your competitors.
+
+In 6 months, those competitors will be even more established on Google. The later you start, the harder it catches up.
+
+I'll check back in a month. In the meantime, here's my WhatsApp — save it. When you're ready, I'm one message away.
+
+And if you want, I can send you a free mockup right now so you can see what it looks like. No commitment.`},
+
+{name:"They say NO — I'll think about it",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "I'll think about it"",
+text:`Of course — take your time.
+
+But can I ask: what specifically are you thinking about? Is it:
+→ The price? (I can do payment plans)
+→ Not sure if you need it? (I can show you proof)
+→ Too busy right now? (I handle everything, you do nothing)
+
+If you tell me what's holding you back, I can address it. Otherwise "I'll think about it" usually means "no" — and I'd rather you tell me straight so I can help.
+
+What's the real concern?`},
+
+{name:"They say NO — Too cheap, I don't trust it",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "too cheap / not professional"",
+text:`I get that — you get what you pay for, right?
+
+Here's why it's affordable:
+→ I'm building my portfolio in Algeria
+→ I work fast because I use modern tools
+→ No overhead costs (no office, no employees)
+→ I want repeat clients, not one-time money
+
+Look at my work: vex-studio.com/vex/ — that's a real website I built. Professional, responsive, animated.
+
+The quality is premium. The price is low because I'm investing in relationships, not extracting money.
+
+200,000 DA for a 700,000 DA quality site. Want to see the proof?`},
+
+{name:"They say NO — I already have someone",cat:"universal",phone:"",priority:"high",type:"no",
+step:"STEP 3 — If they say "I have someone"",
+text:`That's great — loyalty is important.
+
+Can I ask: when did they deliver your last project? Is your current website up to date?
+
+Here's what I offer that others don't:
+→ 7-day delivery (most take 2-4 weeks)
+→ Free mockup before you pay anything
+→ 30 days of free support
+→ Modern design (not outdated templates)
+
+If your current person is doing a great job, stick with them. But if you ever need a backup or a fresh perspective, I'm here.
+
+Can I send you my portfolio just in case?`},
+
+// ==========================================
+// STEP 4: FOLLOW-UPS
+// ==========================================
+{name:"Follow-up #1 — 2 days later",cat:"universal",phone:"",priority:"high",type:"follow",
+step:"STEP 4 — Send 2 days after no reply",
+text:`Hey, I sent you a message a couple days ago about your website.
+
+Just checking — did you see it?
+
+I can make you a free mockup so you can see exactly what your site would look like. Takes 24 hours. No commitment.
+
+Want me to do that?`},
+
+{name:"Follow-up #2 — 5 days later",cat:"universal",phone:"",priority:"high",type:"follow",
+step:"STEP 4 — Send 5 days after no reply",
+text:`Hey! I know you're busy — just a quick reminder.
+
+I offered to make you a free mockup of your website. You'd see exactly what it looks like before deciding anything.
+
+No risk, no commitment. Just a preview.
+
+I have 2 spots left this month. Want me to use one for you?`},
+
+{name:"Follow-up #3 — 10 days later (last chance)",cat:"universal",phone:"",priority:"high",type:"follow",
+step:"STEP 4 — Last follow-up",
+text:`Hi, this is my last message about this — I don't want to spam you.
+
+Here's the deal: I have 1 spot left this month. After that, I'm booked until next month.
+
+If you want it, let me know. If not, no hard feelings — good luck with your business! 🙏
+
+But remember: every month without a website, your competitors get stronger on Google.
+
+The choice is yours.`},
+
+{name:"After they say YES — Collect info",cat:"universal",phone:"",priority:"high",type:"follow",
+step:"STEP 5 — After they agree to start",
+text:`Perfect! Here's what I need from you:
+
+1. Business name (exact spelling)
+2. Address + city
+3. Phone number(s)
+4. Email
+5. What services/products do you offer? (list them)
+6. Any photos? (logo, products, building, team)
+7. Colors you like? (or I'll match your brand)
+8. Any competitor websites you like?
+
+Send me all of this and I'll have your mockup in 24 hours.
+
+Let's go! 🚀`},
+
+{name:"After collecting info — Confirm timeline",cat:"universal",phone:"",priority:"high",type:"follow",
+step:"STEP 5 — After getting their info",
+text:`Got everything! Here's the plan:
+
+→ Today: I start designing
+→ Tomorrow: You get the mockup to review
+→ Day 3-5: I build the full site
+→ Day 6: You review + request changes
+→ Day 7: It goes LIVE on Google
+
+Payment: 100,000 DA now (50%) → I start immediately.
+Remaining 375 when it's done.
+
+CCP/Baridimob: [YOUR NUMBER]
+
+Send me the payment confirmation and we're rolling! 🚀`}
+];
+
+function render(data){
+    const grid=document.getElementById('pitches');
+    grid.innerHTML=data.map(p=>{
+        const typeColor = p.type==='pitch'?'tag-cat':p.type==='yes'?'tag-yes':p.type==='no'?'tag-no':'tag-follow';
+        const typeName = p.type==='pitch'?'PITCH':p.type==='yes'?'YES':p.type==='no'?'NO':'FOLLOW-UP';
+        return `
+        <div class="pitch-card" data-type="${p.type}" data-cat="${p.cat}">
+            <div class="pitch-head">
+                <div>
+                    <div class="pitch-name">${p.name}</div>
+                    <div class="pitch-meta">
+                        <span class="pitch-tag ${typeColor}">${typeName}</span>
+                        <span class="pitch-tag tag-step">${p.step}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pitch-text">${p.text}</div>
+            <div class="pitch-actions">
+                <button class="btn-copy" onclick="copyText(this,${JSON.stringify(p.text).replace(/"/g,'&quot;')})">📋 Copy Script</button>
+                <a class="btn-wa" href="https://wa.me/${(p.phone||'').replace(/[^0-9]/g,'')}" target="_blank">💬 WhatsApp</a>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function copyText(btn,text){
+    navigator.clipboard.writeText(text);
+    btn.textContent='✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copy Script';btn.classList.remove('copied')},2000);
+}
+
+function filterAll(){render(pitches);setActive(0)}
+function filterType(t){render(pitches.filter(p=>p.type===t));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))}
+function setActive(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',j===i))}
+
+render(pitches);
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEX — Mohammadia Lead List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Space Grotesk',sans-serif;background:#0A0A0A;color:#fff;padding:40px 20px;min-height:100vh}
+        .header{text-align:center;margin-bottom:50px}
+        .header h1{font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,#C9A84C,#E8D48B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+        .header p{color:rgba(255,255,255,.35);font-size:.9rem}
+        .stats{display:flex;gap:20px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+        .stat-box{background:#111;padding:20px 30px;border:1px solid rgba(255,255,255,.06);text-align:center;min-width:150px}
+        .stat-box .num{font-size:2rem;font-weight:700;color:#C9A84C}
+        .stat-box .label{font-size:.7rem;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+        .filters{display:flex;gap:10px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
+        .filter-btn{padding:8px 20px;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:.75rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s;letter-spacing:.05em}
+        .filter-btn:hover,.filter-btn.active{background:#C9A84C;color:#0A0A0A;border-color:#C9A84C}
+        .filter-btn.no-website{border-color:rgba(239,68,68,.3);color:rgba(239,68,68,.6)}
+        .filter-btn.no-website:hover,.filter-btn.no-website.active{background:#EF4444;color:#fff;border-color:#EF4444}
+        table{width:100%;max-width:1200px;margin:0 auto;border-collapse:collapse}
+        th{text-align:left;padding:14px 16px;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.08);font-weight:500}
+        td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;color:rgba(255,255,255,.7);vertical-align:middle}
+        tr:hover td{background:rgba(201,168,76,.03)}
+        .tag{display:inline-block;padding:3px 10px;font-size:.65rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border-radius:2px}
+        .tag-no{background:rgba(239,68,68,.12);color:#EF4444;border:1px solid rgba(239,68,68,.2)}
+        .tag-yes{background:rgba(34,197,94,.12);color:#22C55E;border:1px solid rgba(34,197,94,.2)}
+        .tag-low{background:rgba(251,191,36,.12);color:#FBBF24;border:1px solid rgba(251,191,36,.2)}
+        .tag-cat{background:rgba(201,168,76,.08);color:#C9A84C;border:1px solid rgba(201,168,76,.15)}
+        .phone{color:#C9A84C;font-weight:500;white-space:nowrap}
+        .priority-high{border-left:3px solid #EF4444}
+        .priority-med{border-left:3px solid #FBBF24}
+        .priority-low{border-left:3px solid #22C55E}
+        .pitch-btn{padding:5px 14px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:#C9A84C;font-size:.65rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block}
+        .pitch-btn:hover{background:#C9A84C;color:#0A0A0A}
+        .note{max-width:1200px;margin:40px auto 0;padding:24px;background:#111;border:1px solid rgba(255,255,255,.06);font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.7}
+        .note h3{color:#C9A84C;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+        .note ul{list-style:none;padding:0}
+        .note li{padding:4px 0}
+        .note li::before{content:'→ ';color:#C9A84C}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Mohammadia Lead List</h1>
+        <p>Local businesses near Mohammadia, Algiers — prospects for VEX web/app services</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-box"><div class="num">45</div><div class="label">Total Leads</div></div>
+        <div class="stat-box"><div class="num" style="color:#EF4444">41</div><div class="label">No / Bad Website</div></div>
+        <div class="stat-box"><div class="num" style="color:#22C55E">4</div><div class="label">Has Website</div></div>
+        <div class="stat-box"><div class="num" style="color:#FBBF24">28</div><div class="label">High Priority</div></div>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterAll()">All (25)</button>
+        <button class="filter-btn no-website" onclick="filterNoSite()">🔴 No / Bad Site (19)</button>
+        <button class="filter-btn" onclick="filterHigh()">⚡ High Priority (12)</button>
+        <button class="filter-btn" onclick="filterCat('medical')">🏥 Medical</button>
+        <button class="filter-btn" onclick="filterCat('legal')">⚖️ Legal</button>
+        <button class="filter-btn" onclick="filterCat('food')">🍽️ Food & Café</button>
+        <button class="filter-btn" onclick="filterCat('retail')">🛍️ Retail</button>
+        <button class="filter-btn" onclick="filterCat('services')">🔧 Services</button>
+        <button class="filter-btn" onclick="filterArea('lespins')">📍 Les Pins</button>
+        <button class="filter-btn" onclick="filterArea('bordj')">📍 Bordj El Kiffan</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Business</th>
+                <th>Category</th>
+                <th>Phone</th>
+                <th>Website?</th>
+                <th>Priority</th>
+                <th>Site Audit</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="leads">
+        </tbody>
+    </table>
+
+    <div class="note">
+        <h3>How to Use This List</h3>
+        <ul>
+            <li><strong>High Priority</strong> = No website + professional business (dental, law, medical) — they NEED a site</li>
+            <li><strong>Medium Priority</strong> = No website but could benefit — restaurants, shops, cafés</li>
+            <li><strong>Pitch:</strong> "I noticed you don't have a website. We build professional sites starting at €750. Can I show you what we could create for you?"</li>
+            <li><strong>WhatsApp approach:</strong> Send a screenshot of a competitor's site + "We can build you something even better"</li>
+            <li><strong>Best time to call:</strong> 10am-12pm or 4pm-6pm (Algeria time)</li>
+            <li><strong>Close the deal:</strong> Offer a free mockup — show them what their site could look like before they pay</li>
+        </ul>
+    </div>
+
+<script>
+const leads = [
+    {name:"Rahmouni Oualid — Avocat",cat:"legal",phone:"+213 218 208 37",mobile:"+213 662 461 089",website:false,priority:"high",address:"23 Avenue Ould Sid Echikh"},
+    {name:"Daoud Abd El Wahab — Avocat",cat:"legal",phone:"",mobile:"+213 550 150 038",website:false,priority:"high",address:"78 Logements, Mohammadia"},
+    {name:"Belbaki Soumia — Avocat",cat:"legal",phone:"+213 212 183 03",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"HB Cabinet d'Avocat",cat:"legal",phone:"+213 219 851 28",mobile:"+213 771 702 143",website:true,priority:"high",address:"Tour ABC 11ème étage, Pins Maritimes",siteUrl:"hbavocat-dz.com",siteStatus:"outdated",siteNotes:"Text-only page from ~2005. No design, no portfolio, no mobile. CRITICAL rewrite needed."},
+    {name:"Notaire Touati Djamel",cat:"legal",phone:"+213 202 175 55",mobile:"+213 553 389 146",website:true,priority:"med",address:"Cité Mokhtar Zerhouni, Mohammadia",siteUrl:"notaire-touati.com",siteStatus:"basic",siteNotes:"Arabic WordPress template. Decent but generic. Could upgrade to premium."},
+    {name:"Notaire Zanabi",cat:"legal",phone:"+213 238 213 15",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Cabinet Notaire Bousri Mokhtar",cat:"legal",phone:"+213 219 965 68",mobile:"+213 552 655 113",website:false,priority:"med",address:"Mohammadia"},
+    {name:"FIKA Coffee Shop",cat:"food",phone:"",mobile:"+213 560 123 994",website:false,priority:"med",address:"5 Maison Mohammadia"},
+    {name:"Khaimat Dar Many — Restaurant",cat:"food",phone:"",mobile:"",website:false,priority:"med",address:"Mohammadia, Dar el Beïda"},
+    {name:"Dr. Mohammadia — Psychiatre",cat:"medical",phone:"+213 458 700 75",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Dr. Mohammadia — Dermatologue",cat:"medical",phone:"+213 458 700 75",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Dr. Mohammadia — Pediatre",cat:"medical",phone:"+213 238 208 31",mobile:"",website:false,priority:"high",address:"Cité 618 Logements"},
+    {name:"Dr. Mohammadia — Neurochirurgien",cat:"medical",phone:"+213 215 382 87",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Dr. Mohammadia — Ophtalmologue",cat:"medical",phone:"+213 458 994 46",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Dr. Mohammadia — ORL",cat:"medical",phone:"+213 458 994 53",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Chirurgien Esthétique Mohammadia",cat:"medical",phone:"+213 555 671 821",mobile:"",website:false,priority:"high",address:"Cité 72 Logements, Tamaris"},
+    {name:"Médecin Généraliste Mohammadia",cat:"medical",phone:"+213 698 623 984",mobile:"",website:false,priority:"high",address:"Mohammadia"},
+    {name:"Algérie Télécom — Agence Mohammadia",cat:"services",phone:"+213 215 258 80",mobile:"",website:true,priority:"low",address:"Route Nationale N5, Cinq Maisons"},
+    {name:"Condor Showroom — Mohammadia",cat:"retail",phone:"+213 458 783 12",mobile:"+213 550 222 148",website:false,priority:"med",address:"Mohammadia, Mascara"},
+    {name:"SARL Skills Avenue",cat:"services",phone:"0555920936",mobile:"",website:false,priority:"med",address:"Mohammadia Mall, Bureau 1163",siteStatus:"none",siteNotes:"Training center — NO website at all, just directory listing. Perfect target."},
+    {name:"SARL Creativa Technologies",cat:"services",phone:"",mobile:"",website:false,priority:"med",address:"Mohammadia, Alger",siteStatus:"facebook_only",siteNotes:"Facebook page only. Tech company with NO website — embarrassing for a tech firm."},
+    {name:"SARL Khalil Food",cat:"food",phone:"",mobile:"",website:false,priority:"med",address:"Mohammadia, Alger"},
+    {name:"SARL RMC Pharm",cat:"medical",phone:"",mobile:"",website:false,priority:"med",address:"Mohammadia, Alger"},
+    {name:"SARL Green Valley Agro",cat:"retail",phone:"",mobile:"",website:false,priority:"med",address:"Mohammadia, Alger"},
+    {name:"SARL Gloebale Invest",cat:"services",phone:"",mobile:"",website:false,priority:"low",address:"Mohammadia, Alger"},
+    // === LES PINS / PINS MARITIMES ===
+    {name:"Dimachki Cuisine",cat:"retail",phone:"0552 065 682",mobile:"0560 974 008",website:false,priority:"high",address:"Les Pins Maritimes, Mohammadia",siteStatus:"none",siteNotes:"Kitchen showroom — FB + IG only. Needs a proper catalog site to showcase designs."},
+    {name:"General IT",cat:"services",phone:"0550 054 100",mobile:"0560 017 000",website:true,priority:"med",address:"Cité Les Mandarines, Pins Maritimes",siteUrl:"general-it.dz",siteStatus:"basic",siteNotes:"IT company — has site but could upgrade. Good for app development pitch."},
+    {name:"Mersa Trade",cat:"retail",phone:"0770 074 520",mobile:"0770 074 544",website:false,priority:"high",address:"Les Pins Maritimes, Mohammadia",siteStatus:"none",siteNotes:"Electronics store — no website. Needs online catalog for products."},
+    {name:"Woodify Showroom",cat:"retail",phone:"",mobile:"",website:false,priority:"high",address:"Cité Zerhouni Mokhtar, Pins Maritimes",siteStatus:"none",siteNotes:"Furniture showroom — no website at all. Perfect for portfolio site."},
+    {name:"Ads Print",cat:"services",phone:"021 21 05 98",mobile:"",website:false,priority:"med",address:"99 Les Pins Maritimes, Cité Les Mandarines",siteStatus:"none",siteNotes:"Printing company — no website. Irony: they print things but have no web presence."},
+    // === BORDJ EL KIFFAN ===
+    {name:"La Broche Grill & Kebab",cat:"food",phone:"0541 751 124",mobile:"",website:false,priority:"high",address:"N24, Bordj El Kiffan",siteStatus:"facebook_only",siteNotes:"Top rated restaurant (5/5 Tripadvisor) — IG only. Needs website for menu + reservations."},
+    {name:"Restaurant L'Hirondelle",cat:"food",phone:"",mobile:"",website:false,priority:"med",address:"Bordj El Kiffan",siteStatus:"none",siteNotes:"Established restaurant — no website. Needs online presence."},
+    {name:"Café El Amir",cat:"food",phone:"",mobile:"",website:false,priority:"med",address:"Zone d'activité Kaidi, Bordj El Kiffan",siteStatus:"none",siteNotes:"Café — no website. Could use menu + location page."},
+    {name:"La Villa Hôtel Restaurant",cat:"food",phone:"",mobile:"",website:false,priority:"high",address:"Zone d'activité Kaidi, Bordj El Kiffan",siteStatus:"none",siteNotes:"Hotel + Restaurant — CRITICAL to have a website for bookings. No site = losing money."},
+    {name:"Hotel Relax",cat:"services",phone:"",mobile:"",website:false,priority:"high",address:"Bordj El Kiffan",siteStatus:"none",siteNotes:"Hotel — no website. Hotels without websites lose 90% of bookings to Booking.com."},
+    {name:"Mh Medina Hôtel",cat:"services",phone:"",mobile:"",website:false,priority:"high",address:"Bordj El Kiffan",siteStatus:"none",siteNotes:"Hotel — no website. Same as above, critical need."},
+    {name:"Hotel De La Place",cat:"services",phone:"",mobile:"",website:false,priority:"high",address:"Bordj El Kiffan",siteStatus:"none",siteNotes:"Hotel — no website. Easy pitch: 'Your competitors are on Booking.com, you're invisible.'"},
+    {name:"DZ Forest Restaurant",cat:"food",phone:"0699 162 412",mobile:"0781 800 303",website:false,priority:"high",address:"L'Artisanat, Bordj El Kiffan",siteStatus:"facebook_only",siteNotes:"Popular restaurant — IG/FB only. Needs website with menu + delivery ordering."},
+    {name:"Wood Cup Café",cat:"food",phone:"0782 165 278",mobile:"",website:false,priority:"med",address:"15 Bd Front de Mer, Bordj El Kiffan",siteStatus:"none",siteNotes:"Beachfront café — no website. Perfect for location + menu page."},
+    {name:"Restaurant Bordj Elkiffan",cat:"food",phone:"0781 431 226",mobile:"",website:false,priority:"med",address:"Rue Frère Meddour, Bordj El Kiffan",siteStatus:"none",siteNotes:"Restaurant — no website. Needs online menu + contact."},
+    {name:"Restaurant Moulak Wehdek",cat:"food",phone:"0553 087 193",mobile:"",website:false,priority:"med",address:"Bordj El Kiffan",siteStatus:"none",siteNotes:"Restaurant — no website. Basic site would help with visibility."},
+    {name:"Aviva Bordj El Kiffan",cat:"food",phone:"",mobile:"",website:false,priority:"med",address:"Bordj El Kiffan",siteStatus:"none",siteNotes:"Café — no website. Quick pitch opportunity."},
+    {name:"EURL Bylam Equipment",cat:"retail",phone:"0550 788 799",mobile:"",website:false,priority:"high",address:"Bordj El Kiffan",siteStatus:"facebook_only",siteNotes:"Equipment showroom — FB only. B2B company needs professional website for credibility."},
+    {name:"Cosmos Alpha",cat:"retail",phone:"",mobile:"",website:false,priority:"med",address:"Zone d'activité Kaidi, Bordj El Kiffan",siteStatus:"none",siteNotes:"Business — no website. Needs online presence."},
+    {name:"Acom Technology",cat:"services",phone:"",mobile:"",website:false,priority:"high",address:"Zone d'activité Kaidi, Bordj El Kiffan",siteStatus:"none",siteNotes:"Tech company — no website. Perfect pitch: 'You're in tech but have no site?'"}
+];
+
+function render(data){
+    const tbody=document.getElementById('leads');
+    tbody.innerHTML=data.map((l,i)=>`
+        <tr class="priority-${l.priority}" data-cat="${l.cat}" data-noweb="${!l.website}">
+            <td style="color:rgba(255,255,255,.2)">${i+1}</td>
+            <td><strong style="color:#fff">${l.name}</strong><br><span style="font-size:.7rem;color:rgba(255,255,255,.25)">${l.address}</span><br><span style="font-size:.6rem;color:rgba(201,168,76,.4);letter-spacing:.08em;text-transform:uppercase">${getArea(l)==='bordj'?'BORDJ EL KIFFAN':getArea(l)==='lespins'?'LES PINS':'MOHAMMADIA'}</span></td>
+            <td><span class="tag tag-cat">${l.cat}</span></td>
+            <td class="phone">${l.phone||l.mobile||'—'}${l.phone&&l.mobile?'<br>'+l.mobile:''}</td>
+            <td>${l.siteStatus==='outdated'?'<span class="tag tag-no">💀 OUTDATED</span>':l.siteStatus==='basic'?'<span class="tag tag-low">⚠️ BASIC</span>':l.siteStatus==='facebook_only'?'<span class="tag tag-low">📘 FB ONLY</span>':l.website?'<span class="tag tag-yes">HAS SITE</span>':'<span class="tag tag-no">NO SITE</span>'}${l.siteNotes?'<br><span style="font-size:.6rem;color:rgba(255,255,255,.3);display:block;margin-top:4px;max-width:200px;line-height:1.4">'+l.siteNotes+'</span>':''}</td>
+            <td>${l.priority==='high'?'<span class="tag tag-no">⚡ HIGH</span>':l.priority==='med'?'<span class="tag tag-low">MEDIUM</span>':'<span class="tag tag-yes">LOW</span>'}</td>
+            <td><a class="pitch-btn" href="https://wa.me/${(l.phone||l.mobile).replace(/[^0-9]/g,'')}" target="_blank">Pitch →</a></td>
+        </tr>
+    `).join('');
+}
+
+function getArea(l){const a=(l.address||'').toLowerCase();if(a.includes('bordj'))return 'bordj';if(a.includes('pins')||a.includes('mandarines'))return 'lespins';return 'mohammadia'}
+function filterAll(){render(leads);setActive(0)}
+function filterNoSite(){render(leads.filter(l=>!l.website||l.siteStatus==='outdated'||l.siteStatus==='facebook_only'));setActive(1)}
+function filterHigh(){render(leads.filter(l=>l.priority==='high'));setActive(2)}
+function filterCat(c){render(leads.filter(l=>l.cat===c));document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'))}
+function filterArea(a){render(leads.filter(l=>getArea(l)===a));document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'))}
+function setActive(i){document.querySelectorAll('.filter-btn').forEach((b,j)=>{b.classList.toggle('active',j===i)})}
+
+render(leads);
+</script>
+</body>
+</html>

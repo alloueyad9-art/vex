@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEX — Sales CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#C9A84C;--gold-light:#E8D48B;--dark:#0A0A0A;--card:#111;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.7);--text2:rgba(255,255,255,.35);--green:#22C55E;--red:#EF4444;--yellow:#FBBF24;--blue:#3B82F6}
+body{font-family:'Space Grotesk',sans-serif;background:var(--dark);color:#fff;min-height:100vh;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(10,10,10,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-weight:700;font-size:1.1rem;display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:6px}
+.nav-link{padding:8px 16px;font-size:.72rem;color:var(--text2);cursor:pointer;border:1px solid transparent;border-radius:4px;transition:all .3s;font-family:'Space Grotesk',sans-serif;background:none;letter-spacing:.03em}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.04)}
+.nav-link.active{color:var(--gold);background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.15)}
+.page{display:none;padding:80px 32px 40px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:32px}
+.stat{background:var(--card);border:1px solid var(--border);padding:16px;text-align:center}
+.stat .num{font-size:1.8rem;font-weight:700;line-height:1}
+.stat .label{font-size:.6rem;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.filters{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.filter{padding:5px 14px;background:transparent;border:1px solid rgba(255,255,255,.08);color:var(--text2);font-size:.68rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s;border-radius:3px}
+.filter:hover{color:#fff;border-color:rgba(255,255,255,.15)}
+.filter.active{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.search{width:100%;padding:10px 16px;background:var(--card);border:1px solid var(--border);color:#fff;font-size:.82rem;font-family:'Space Grotesk',sans-serif;outline:none;margin-bottom:16px;transition:border-color .3s}
+.search:focus{border-color:var(--gold)}
+.search::placeholder{color:var(--text2)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border);font-weight:500;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);font-size:.8rem;color:var(--text);vertical-align:middle}
+tr{cursor:pointer;transition:background .2s}
+tr:hover td{background:rgba(201,168,76,.04)}
+tr.selected td{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.1)}
+.tag{display:inline-block;padding:2px 8px;font-size:.58rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:2px;white-space:nowrap}
+.tag-high{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.15)}
+.tag-med{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.15)}
+.tag-low{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.15)}
+.tag-cat{background:rgba(201,168,76,.06);color:var(--gold);border:1px solid rgba(201,168,76,.1)}
+.tag-nosite{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.15)}
+.tag-has{background:rgba(34,197,94,.08);color:var(--green);border:1px solid rgba(34,197,94,.12)}
+.phone{color:var(--gold);font-size:.75rem;white-space:nowrap}
+
+/* DETAIL PANEL */
+.detail{display:none;background:var(--card);border:1px solid var(--border);margin-top:24px;overflow:hidden}
+.detail.open{display:block}
+.detail-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.detail-name{font-size:1.1rem;font-weight:700}
+.detail-info{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.detail-close{padding:6px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .3s}
+.detail-close:hover{color:#fff;border-color:rgba(255,255,255,.15)}
+.detail-body{padding:24px}
+
+/* SALES STEPS */
+.sales-flow{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap}
+.sales-step{flex:1;min-width:100px;padding:10px 14px;background:var(--dark);border:1px solid var(--border);text-align:center;cursor:pointer;transition:all .3s;position:relative}
+.sales-step:first-child{border-radius:4px 0 0 4px}
+.sales-step:last-child{border-radius:0 4px 4px 0}
+.sales-step:hover{border-color:rgba(255,255,255,.12)}
+.sales-step.active{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.sales-step .step-num{font-size:.6rem;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.sales-step .step-label{font-size:.72rem;font-weight:600;color:var(--text)}
+.sales-step.active .step-label{color:var(--gold)}
+
+.pitch-box{background:var(--dark);border:1px solid var(--border);padding:20px;margin-bottom:16px}
+.pitch-box-title{font-size:.72rem;font-weight:600;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pitch-text{font-size:.82rem;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Inter',sans-serif}
+.pitch-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{padding:8px 18px;font-size:.7rem;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:all .3s;border-radius:3px;border:none}
+.btn-gold{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--gold)}
+.btn-gold:hover{background:var(--gold);color:var(--dark)}
+.btn-green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green)}
+.btn-green:hover{background:var(--green);color:#fff}
+.btn-red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+.btn-red:hover{background:var(--red);color:#fff}
+.btn-yellow{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--yellow)}
+.btn-yellow:hover{background:var(--yellow);color:var(--dark)}
+.btn-wa{background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#25D366;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-wa:hover{background:#25D366;color:#fff}
+.btn.copied{background:var(--green)!important;border-color:var(--green)!important;color:#fff!important}
+.no-phone{font-size:.75rem;color:var(--text2);font-style:italic}
+
+.objection-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px}
+.objection-btn{padding:10px 14px;background:var(--dark);border:1px solid var(--border);cursor:pointer;text-align:left;transition:all .3s;font-family:'Space Grotesk',sans-serif}
+.objection-btn:hover{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)}
+.objection-btn .obj-label{font-size:.68rem;color:var(--red);font-weight:600;margin-bottom:4px}
+.objection-btn .obj-text{font-size:.72rem;color:var(--text2)}
+
+@media(max-width:768px){
+    nav{padding:0 16px}.nav-links{display:none}
+    .page{padding:70px 16px 32px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .sales-flow{flex-direction:column}
+    .objection-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-logo">◆ <span>VEX</span> CRM</div>
+    <div class="nav-links">
+        <button class="nav-link active" onclick="showPage('leads')">Leads</button>
+        <button class="nav-link" onclick="showPage('allpitches')">All Pitches</button>
+    </div>
+</nav>
+
+<!-- LEADS PAGE -->
+<div class="page active" id="page-leads">
+    <div class="stats" id="leadStats"></div>
+    <input type="text" class="search" placeholder="Search business name, area, category..." oninput="searchLeads(this.value)">
+    <div class="filters" id="leadFilters"></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr>
+                <th>#</th><th>Business</th><th>Category</th><th>Area</th><th>Phone</th><th>Website</th><th>Priority</th>
+            </tr></thead>
+            <tbody id="leadsBody"></tbody>
+        </table>
+    </div>
+    <div class="detail" id="detailPanel"></div>
+</div>
+
+<!-- ALL PITCHES PAGE -->
+<div class="page" id="page-allpitches">
+    <div style="font-size:1.2rem;font-weight:700;margin-bottom:6px">All Pitch Scripts</div>
+    <div style="font-size:.82rem;color:var(--text2);margin-bottom:24px">Generic scripts by business type. For personalized pitches, click a lead.</div>
+    <div class="filters" id="pitchFilters"></div>
+    <div id="allPitchGrid" style="display:flex;flex-direction:column;gap:14px"></div>
+</div>
+
+<script>
+// ==================== DATA ====================
+const leads = [
+    {id:1,name:"Rahmouni Oualid — Avocat",cat:"legal",phone:"+213 662 461 089",area:"mohammadia",priority:"high",site:"none",notes:"23 Ave Ould Sid Echikh"},
+    {id:2,name:"Daoud Abd El Wahab — Avocat",cat:"legal",phone:"+213 550 150 038",area:"mohammadia",priority:"high",site:"none",notes:"78 Logements"},
+    {id:3,name:"Belbaki Soumia — Avocat",cat:"legal",phone:"+213 212 183 03",area:"mohammadia",priority:"high",site:"none",notes:"Mohammadia"},
+    {id:4,name:"HB Cabinet d'Avocat",cat:"legal",phone:"+213 771 702 143",area:"mohammadia",priority:"high",site:"outdated",notes:"hbavocat-dz.com — text-only 2005 style"},
+    {id:5,name:"Notaire Touati Djamel",cat:"legal",phone:"+213 553 389 146",area:"mohammadia",priority:"med",site:"basic",notes:"notaire-touati.com — WordPress template"},
+    {id:6,name:"Notaire Zanabi",cat:"legal",phone:"+213 238 213 15",area:"mohammadia",priority:"high",site:"none",notes:"Mohammadia"},
+    {id:7,name:"Cabinet Notaire Bousri",cat:"legal",phone:"+213 552 655 113",area:"mohammadia",priority:"med",site:"none",notes:"Mohammadia"},
+    {id:8,name:"FIKA Coffee Shop",cat:"food",phone:"+213 560 123 994",area:"mohammadia",priority:"med",site:"none",notes:"5 Maison Mohammadia"},
+    {id:9,name:"Khaimat Dar Many",cat:"food",phone:"",area:"mohammadia",priority:"med",site:"none",notes:"Dar el Beïda"},
+    {id:10,name:"Dr. — Pediatre",cat:"medical",phone:"+213 238 208 31",area:"mohammadia",priority:"high",site:"none",notes:"Cité 618 Logements"},
+    {id:11,name:"Dr. — Neurochirurgien",cat:"medical",phone:"+213 215 382 87",area:"mohammadia",priority:"high",site:"none",notes:"Mohammadia"},
+    {id:12,name:"Dr. — Ophtalmologue",cat:"medical",phone:"+213 458 994 46",area:"mohammadia",priority:"high",site:"none",notes:"Mohammadia"},
+    {id:13,name:"Dr. — ORL",cat:"medical",phone:"+213 458 994 53",area:"mohammadia",priority:"high",site:"none",notes:"Mohammadia"},
+    {id:14,name:"Chirurgien Esthétique",cat:"medical",phone:"+213 555 671 821",area:"mohammadia",priority:"high",site:"none",notes:"Cité 72, Tamaris"},
+    {id:15,name:"Médecin Généraliste",cat:"medical",phone:"+213 698 623 984",area:"mohammadia",priority:"high",site:"none",notes:"Mohammadia"},
+    {id:16,name:"Algérie Telecom",cat:"services",phone:"+213 215 258 80",area:"mohammadia",priority:"low",site:"has",notes:"Corporate — skip"},
+    {id:17,name:"Condor Showroom",cat:"retail",phone:"+213 550 222 148",area:"mohammadia",priority:"med",site:"none",notes:"Mohammadia, Mascara"},
+    {id:18,name:"SARL Skills Avenue",cat:"services",phone:"0555 920 936",area:"mohammadia",priority:"med",site:"none",notes:"Mohammadia Mall, Bureau 1163"},
+    {id:19,name:"SARL Creativa Technologies",cat:"services",phone:"",area:"mohammadia",priority:"med",site:"fb_only",notes:"FB page only — tech company"},
+    {id:20,name:"SARL Khalil Food",cat:"food",phone:"",area:"mohammadia",priority:"med",site:"none",notes:"Mohammadia"},
+    {id:21,name:"SARL RMC Pharm",cat:"medical",phone:"0551 419 195",area:"mohammadia",priority:"med",site:"none",notes:"Mohammadia — also: 0660 49 00 20"},
+    {id:22,name:"SARL Green Valley Agro",cat:"retail",phone:"",area:"mohammadia",priority:"med",site:"none",notes:"Mohammadia"},
+    {id:23,name:"SARL Gloebale Invest",cat:"services",phone:"",area:"mohammadia",priority:"low",site:"none",notes:"Mohammadia"},
+    {id:24,name:"Dimachki Cuisine",cat:"retail",phone:"0552 065 682",area:"lespins",priority:"high",site:"none",notes:"Kitchen showroom — WhatsApp: 0560 974 008"},
+    {id:25,name:"General IT",cat:"services",phone:"0550 054 100",area:"lespins",priority:"med",site:"basic",notes:"general-it.dz — old design"},
+    {id:26,name:"Mersa Trade",cat:"retail",phone:"0770 074 520",area:"lespins",priority:"high",site:"none",notes:"Electronics store"},
+    {id:27,name:"Woodify Showroom",cat:"retail",phone:"0770 74 43 97",area:"lespins",priority:"high",site:"none",notes:"Furniture showroom, Les Pins Maritimes"},
+    {id:28,name:"Ads Print",cat:"services",phone:"021 21 05 98",area:"lespins",priority:"med",site:"none",notes:"Printing company"},
+    {id:29,name:"La Broche Grill & Kebab",cat:"food",phone:"0541 751 124",area:"bordj",priority:"high",site:"none",notes:"5/5 Tripadvisor, IG only"},
+    {id:30,name:"Restaurant L'Hirondelle",cat:"food",phone:"",area:"bordj",priority:"med",site:"none",notes:"Bordj El Kiffan"},
+    {id:31,name:"Café El Amir",cat:"food",phone:"",area:"bordj",priority:"med",site:"none",notes:"Zone d'activité Kaidi"},
+    {id:32,name:"La Villa Hôtel Restaurant",cat:"hotel",phone:"0778 87 77 21",area:"bordj",priority:"high",site:"none",notes:"Zone d'activité Kaidi — also: 0560 35 55 17"},
+    {id:33,name:"Hotel Relax",cat:"hotel",phone:"0557 205 033",area:"bordj",priority:"high",site:"none",notes:"Bordj El Kiffan — also: 0551 850 027"},
+    {id:34,name:"Mh Medina Hôtel",cat:"hotel",phone:"0550 63 65 83",area:"bordj",priority:"high",site:"none",notes:"Bordj El Kiffan — Zone d'activité Kaidi"},
+    {id:35,name:"Hotel De La Place",cat:"hotel",phone:"0777 77 06 54",area:"bordj",priority:"high",site:"none",notes:"Bordj El Kiffan — Zone d'activité Kaidi"},
+    {id:36,name:"DZ Forest Restaurant",cat:"food",phone:"0699 162 412",area:"bordj",priority:"high",site:"fb_only",notes:"Popular, IG/FB only"},
+    {id:37,name:"Wood Cup Café",cat:"food",phone:"0782 165 278",area:"bordj",priority:"med",site:"none",notes:"15 Bd Front de Mer"},
+    {id:38,name:"Restaurant Bordj Elkiffan",cat:"food",phone:"0781 431 226",area:"bordj",priority:"med",site:"none",notes:"Rue Frère Meddour"},
+    {id:39,name:"Restaurant Moulak Wehdek",cat:"food",phone:"0553 087 193",area:"bordj",priority:"med",site:"none",notes:"Bordj El Kiffan"},
+    {id:40,name:"Aviva Bordj El Kiffan",cat:"food",phone:"0554 50 95 74",area:"bordj",priority:"med",site:"none",notes:"Café/Restaurant"},
+    {id:41,name:"EURL Bylam Equipment",cat:"retail",phone:"0550 788 799",area:"bordj",priority:"high",site:"fb_only",notes:"Equipment showroom, FB only"},
+    {id:42,name:"Cosmos Alpha",cat:"retail",phone:"",area:"bordj",priority:"med",site:"none",notes:"Zone d'activité Kaidi"},
+    {id:43,name:"Acom Technology",cat:"services",phone:"0770 61 54 30",area:"bordj",priority:"high",site:"none",notes:"Tech company — Tel: 031 80 10 03"},
+    {id:44,name:"Restaurant Roumaissa",cat:"food",phone:"",area:"bordj",priority:"med",site:"none",notes:"Bordj El Kiffan"},
+    {id:45,name:"SGPS SARL",cat:"services",phone:"",area:"bordj",priority:"med",site:"none",notes:"Bordj El Kiffan"}
+];
+
+// Pitch templates by category
+const pitchTemplates = {
+legal: {
+    opening: (name) => `Hi ${name},
+
+Quick question — how many clients do you lose every month because they can't find you on Google?
+
+I built a website for a lawyer in Algiers last month. Within 2 weeks, he got 4 new clients from Google alone. That's 4 clients he was losing before.
+
+Your firm doesn't have a website right now. That means every time someone searches "avocat Mohammadia" — they find your competitors, not you.
+
+I can fix that in 7 days.
+
+Here's what you get:
+→ Premium website that looks like a 700,000 DA site
+→ Google ranking — people find you when they search
+→ Contact form — clients message you directly
+→ Google Maps — people find your office
+→ Mobile-friendly — works on phones
+
+Price: from 200,000 DA. That's less than what 1 client brings you.
+
+Want me to show you what your site could look like? Free mockup — no commitment.`,
+    outdated: (name,site) => `Hi,
+
+I'm from VEX. I checked your site ${site} — it's just plain text with no design. It doesn't look like a professional law firm at all.
+
+Anyone who sees this clicks away immediately. They don't think "this is a serious firm."
+
+I can give you:
+→ Modern premium design
+→ Portfolio page for your cases
+→ Mobile-friendly — works on phones
+→ Contact form
+
+Your old site probably cost nothing. The new one: from 200,000 DA.
+
+Can we talk?`
+},
+food: {
+    opening: (name) => `Hi ${name},
+
+I just saw your reviews — you're doing great work!
+
+But here's the thing — you're invisible on Google. When someone types "restaurant near me" or "cafe Mohammadia" on Google, you don't show up. They go to a competitor.
+
+That's like having the best food in town but no sign on the door.
+
+I can fix that in 7 days:
+→ Website with your menu + beautiful food photos
+→ Google Maps so people find you
+→ Online reservations — people book without calling
+→ Customer reviews displayed
+→ Mobile-friendly — works on phones
+
+Price: from 200,000 DA. That's less than what you make in one busy night.
+
+Want me to show you what your site could look like? Free mockup — no commitment.`
+},
+hotel: {
+    opening: (name) => `Hi ${name},
+
+I have a quick question — do you know how many travelers search "hotel in your area" on Google every month?
+
+Here's the answer: hundreds. And right now, they can't find you. They go to Booking.com instead, and you pay commission for every booking.
+
+What if you had your own website where people could:
+→ See your rooms + prices + beautiful photos
+→ Book directly — no commission
+→ Read reviews from other guests
+→ Find you on Google Maps
+
+That's exactly what I build. From 200,000 DA — and it pays for itself in the first month because you stop paying commission to Booking.com.
+
+Want me to show you? Free mockup — no commitment.`
+},
+medical: {
+    opening: (name) => `Hi ${name},
+
+I have a question — when people need a doctor in your specialty, what do they do? They Google it.
+
+Right now, when someone searches for your specialty in Mohammadia on Google, you don't show up. They find someone else.
+
+That's patients you're losing every single day.
+
+I can fix that in 7 days:
+→ Professional medical website
+→ Your specialties + diplomas displayed
+→ Online appointment booking — patients book without calling
+→ Google ranking — people find you when they search
+→ Reviews from happy patients
+
+Price: from 200,000 DA. That's one consultation. One. And the website brings you patients for years.
+
+Want me to show you what your site could look like? Free mockup.`
+},
+retail: {
+    opening: (name) => `Hi ${name},
+
+Quick question — when someone in your area wants to buy what you sell, where do they go? Google.
+
+They search for your products and what comes up? Your competitors with websites. Not you.
+
+You have a great store but no online presence. That's like having a shop with the lights off.
+
+I can fix that in 7 days:
+→ Website with your product catalog
+→ Prices displayed — customers know before they come
+→ HD photos of your products
+→ Google Maps — people find your store
+→ Contact + WhatsApp button
+
+Price: from 200,000 DA. That's less than what you make selling a few products.
+
+Want me to show you what your site could look like? Free mockup — no commitment.`
+},
+services: {
+    opening: (name) => `Hi ${name},
+
+I noticed your company doesn't have a professional website.
+
+When potential clients search for your services online, they find your competitors — the ones with websites. You're invisible.
+
+I can fix that in 7 days:
+→ Professional company website
+→ Your services + portfolio
+→ Contact + quote form
+→ Google ranking
+
+Price: from 200,000 DA. One new client pays for the whole site.
+
+Want me to show you? Free mockup — no commitment.`
+}
+};
+
+// Universal responses
+const responses = {
+yes_next: `Awesome! Let me get started.
+
+Quick questions:
+1. What's your business name exactly?
+2. What's your address?
+3. What services/products do you want featured?
+4. Do you have a logo? If not, I'll make one.
+5. Any specific colors or style you like?
+
+I'll have your mockup ready in 24 hours — completely free. You can show it to anyone before deciding.
+
+Let's go! 🚀`,
+
+mockup_close: `Here's your mockup! 👆
+
+This is what your website will look like. Pretty good, right?
+
+If you like it, here's how we move forward:
+→ Choose your package (200K / 350K / 500K DA)
+→ You pay 50% now
+→ I build the full site in 7 days
+→ You pay the rest when it's done
+
+Payment: CCP/Baridimob or cash.
+
+I have 3 spots left this month. Once they're filled, the next available slot is next month.
+
+Want to lock yours in?`,
+
+price_question: `Here's the pricing:
+
+BASIC — 200,000 DA:
+→ Professional website (up to 5 pages)
+→ Mobile-friendly
+→ Contact form + Google Maps
+→ 1 year hosting
+→ SSL certificate
+
+STANDARD — 350,000 DA (most popular):
+→ Everything in Basic
+→ Custom logo design
+→ SEO optimization (Google ranking)
+→ Google My Business setup
+→ 10 pages + blog
+→ Social media integration
+→ WhatsApp button
+
+PREMIUM — 500,000 DA:
+→ Everything in Standard
+→ Online ordering / reservations system
+→ Payment integration (CCP/Baridimob)
+→ Analytics dashboard
+→ Priority support (12 months)
+→ Unlimited pages
+→ Monthly maintenance included
+
+Most clients go for Standard — it's the best value.
+
+Which package works for you?`,
+
+why_needed: `Here's the reality:
+
+→ 81% of people search online before visiting a business
+→ 75% of people judge a business by its website
+→ Businesses with websites get 2x more customers
+
+Without a website:
+→ You're invisible on Google
+→ People can't find your address or phone
+→ You look less professional than competitors
+→ You lose customers every single day
+
+With a website:
+→ People find you when they search
+→ You look professional and trustworthy
+→ Customers can contact you easily
+→ You get more business 24/7
+
+200,000 DA is nothing compared to what you're losing right now.
+
+Ready to start?`,
+
+cheaper: `I hear you. Here's what I can do:
+
+Option 1: Basic — 200,000 DA (starter)
+Option 2: Standard — 350,000 DA with logo + SEO
+Option 3: Payment plan — 70,000 DA/month for 5 months
+Option 4: Split payment — 50% upfront, 50% on delivery
+
+Every month without a website, you lose customers. The sooner we start, the sooner it pays for itself.
+
+Which option works for you?`,
+
+timeline: `7 days. That's it.
+
+Day 1: You send me your info
+Day 2-3: I design your website
+Day 4-5: I build it + add all content
+Day 6: You review + request changes
+Day 7: It goes live on Google
+
+Ready to start?`,
+
+// NO responses
+no_expensive: `I totally understand. Let me ask you something:
+
+How much do you lose every month by NOT having a website?
+
+→ Lawyer losing 2 clients/month = 400,000+ DA lost
+→ Restaurant losing 10 customers/night = 500,000+ DA lost
+→ Hotel losing 5 bookings/month = 750,000+ DA lost
+
+The website starts at 200,000 DA ONCE. It brings you customers FOREVER.
+
+Or we can do a payment plan — 70,000 DA/month.
+
+It's not an expense — it's the cheapest investment you'll ever make.
+
+Can I check back in a month?`,
+
+no_dont_need: `I respect that. But let me show you something:
+
+Google your business type + your area. Look at who shows up. The businesses with websites get the customers. The ones without? Invisible.
+
+You don't need a website IF you have more clients than you can handle. But most businesses don't.
+
+Can I send you a free mockup just so you can see what it looks like? No commitment.`,
+
+no_facebook: `Facebook is great for engagement — but it's not a website.
+
+→ Facebook: Only people who already follow you see your posts
+→ Website: EVERYONE who searches Google finds you
+
+Facebook doesn't show up on Google. A website does.
+
+Think of it this way: Facebook is like a party invitation. A website is like a billboard on the highway. Which one reaches more people?
+
+Can I show you what a website would look like? Free mockup.`,
+
+no_later: `No problem. But here's something to think about:
+
+Every month without a website = customers going to your competitors.
+
+In 6 months, those competitors will be even more established on Google. The later you start, the harder it catches up.
+
+I'll check back in a month. When you're ready, I'm one message away.
+
+And if you want, I can send you a free mockup right now. No commitment.`,
+
+no_think: `Of course — take your time.
+
+But can I ask: what specifically are you thinking about? Is it:
+→ The price? (I can do payment plans)
+→ Not sure if you need it? (I can show you proof)
+→ Too busy right now? (I handle everything)
+
+If you tell me what's holding you back, I can address it.
+
+What's the real concern?`,
+
+no_cheap: `I get that — you get what you pay for, right?
+
+Here's why it's affordable:
+→ I'm building my portfolio in Algeria
+→ I work fast with modern tools
+→ No overhead costs
+→ I want repeat clients, not one-time money
+
+Look at my work: alloueyad9-art.github.io/vex/ — professional, responsive, animated.
+
+From 200,000 DA for a premium quality site. Want to see the proof?`,
+
+no_have_someone: `That's great — loyalty is important.
+
+Can I ask: when did they deliver your last project? Is your current website up to date?
+
+Here's what I offer that others don't:
+→ 7-day delivery
+→ Free mockup before you pay
+→ 30 days free support
+→ Modern design
+
+If your current person is doing a great job, stick with them. But if you need a fresh perspective, I'm here.
+
+Can I send you my portfolio just in case?`,
+
+// Follow-ups
+follow_2d: `Hey, I sent you a message a couple days ago about your website.
+
+Just checking — did you see it?
+
+I can make you a free mockup so you can see exactly what your site would look like. Takes 24 hours. No commitment.
+
+Want me to do that?`,
+
+follow_5d: `Hey! I know you're busy — just a quick reminder.
+
+I offered to make you a free mockup of your website. You'd see exactly what it looks like before deciding.
+
+No risk, no commitment. Just a preview.
+
+I have 2 spots left this month. Want me to use one for you?`,
+
+follow_10d: `Hi, this is my last message about this — I don't want to spam you.
+
+I have 1 spot left this month. After that, I'm booked until next month.
+
+If you want it, let me know. If not, no hard feelings — good luck! 🙏
+
+Every month without a website, your competitors get stronger on Google.
+
+The choice is yours.`,
+
+collect_info: `Perfect! Here's what I need from you:
+
+1. Business name (exact spelling)
+2. Address + city
+3. Phone number(s)
+4. Email
+5. What services/products do you offer?
+6. Any photos? (logo, products, building)
+7. Colors you like? (or I'll match your brand)
+8. Any competitor websites you like?
+
+Send me all of this and I'll have your mockup in 24 hours.
+
+Let's go! 🚀`,
+
+confirm_timeline: `Got everything! Here's the plan:
+
+→ Today: I start designing
+→ Tomorrow: You get the mockup to review
+→ Day 3-5: I build the full site
+→ Day 6: You review + request changes
+→ Day 7: It goes LIVE on Google
+
+Payment: 50% now → I start immediately.
+Remaining 50% when it's done.
+
+CCP/Baridimob: [YOUR NUMBER]
+
+Send me the payment confirmation and we're rolling! 🚀`
+};
+
+// ==================== LEADS PAGE ====================
+let selectedLead = null;
+let leadFilterCat = 'all';
+let leadFilterArea = 'all';
+
+function renderLeads(){
+    let data = [...leads];
+    if(leadFilterCat!=='all') data=data.filter(l=>l.cat===leadFilterCat);
+    if(leadFilterArea!=='all') data=data.filter(l=>l.area===leadFilterArea);
+
+    const total=leads.length;
+    const nosite=leads.filter(l=>['none','fb_only','outdated'].includes(l.site)).length;
+    const high=leads.filter(l=>l.priority==='high').length;
+    const withphone=leads.filter(l=>l.phone).length;
+
+    document.getElementById('leadStats').innerHTML=`
+        <div class="stat"><div class="num" style="color:var(--gold)">${total}</div><div class="label">Total</div></div>
+        <div class="stat"><div class="num" style="color:var(--red)">${nosite}</div><div class="label">No Website</div></div>
+        <div class="stat"><div class="num" style="color:var(--yellow)">${high}</div><div class="label">High Priority</div></div>
+        <div class="stat"><div class="num" style="color:var(--green)">${withphone}</div><div class="label">Have Phone</div></div>
+    `;
+
+    document.getElementById('leadsBody').innerHTML=data.map((l,i)=>`
+        <tr onclick="selectLead(${l.id})" class="${selectedLead&&selectedLead.id===l.id?'selected':''}">
+            <td style="color:var(--text2)">${i+1}</td>
+            <td><strong style="color:#fff">${l.name}</strong><br><span style="font-size:.62rem;color:var(--text2)">${l.notes}</span></td>
+            <td><span class="tag tag-cat">${l.cat}</span></td>
+            <td style="font-size:.72rem;color:var(--text2)">${l.area==='bordj'?'Bordj El Kiffan':l.area==='lespins'?'Les Pins':'Mohammadia'}</td>
+            <td class="phone">${l.phone||'—'}</td>
+            <td>${['none','fb_only','outdated'].includes(l.site)?'<span class="tag tag-nosite">NO SITE</span>':l.site==='basic'?'<span class="tag tag-med">BASIC</span>':'<span class="tag tag-has">HAS</span>'}</td>
+            <td>${l.priority==='high'?'<span class="tag tag-high">HIGH</span>':l.priority==='med'?'<span class="tag tag-med">MED</span>':'<span class="tag tag-low">LOW</span>'}</td>
+        </tr>
+    `).join('');
+}
+
+function initLeadFilters(){
+    document.getElementById('leadFilters').innerHTML=`
+        <button class="filter active" onclick="setLF('cat','all',this)">All</button>
+        <button class="filter" onclick="setLF('cat','legal',this)">Legal</button>
+        <button class="filter" onclick="setLF('cat','food',this)">Food</button>
+        <button class="filter" onclick="setLF('cat','medical',this)">Medical</button>
+        <button class="filter" onclick="setLF('cat','retail',this)">Retail</button>
+        <button class="filter" onclick="setLF('cat','hotel',this)">Hotels</button>
+        <button class="filter" onclick="setLF('cat','services',this)">Services</button>
+        <span style="width:1px;height:20px;background:var(--border);margin:0 4px"></span>
+        <button class="filter" onclick="setLF('area','lespins',this)">Les Pins</button>
+        <button class="filter" onclick="setLF('area','bordj',this)">Bordj El Kiffan</button>
+    `;
+}
+
+function setLF(key,val,btn){
+    if(key==='cat') leadFilterCat=val;
+    if(key==='area') leadFilterArea=val;
+    renderLeads();
+}
+
+function searchLeads(q){
+    q=q.toLowerCase();
+    document.querySelectorAll('#leadsBody tr').forEach(r=>{
+        r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
+    });
+}
+
+// ==================== SELECT LEAD ====================
+function selectLead(id){
+    const lead = leads.find(l=>l.id===id);
+    if(!lead) return;
+    selectedLead = lead;
+    renderLeads();
+    renderDetail(lead);
+}
+
+function renderDetail(l){
+    const panel = document.getElementById('detailPanel');
+    panel.classList.add('open');
+
+    const siteNote = l.site==='outdated'?'💀 Their site is outdated and bad':l.site==='basic'?'⚠️ Their site is basic/template':l.site==='fb_only'?'📘 Facebook page only — no real site':l.site==='has'?'✅ Has a working site':'🔴 No website at all';
+
+    const openingPitch = l.site==='outdated'?pitchTemplates[l.cat]?.outdated?.(l.name.split('—')[0].trim(),l.notes):pitchTemplates[l.cat]?.opening?.(l.name.split('—')[0].trim())||pitchTemplates.services.opening(l.name.split('—')[0].trim());
+
+    panel.innerHTML=`
+        <div class="detail-head">
+            <div>
+                <div class="detail-name">${l.name}</div>
+                <div class="detail-info">
+                    <span class="tag tag-cat">${l.cat}</span>
+                    <span class="tag ${l.priority==='high'?'tag-high':l.priority==='med'?'tag-med':'tag-low'}">${l.priority.toUpperCase()}</span>
+                    <span style="font-size:.72rem;color:var(--text2)">${l.area==='bordj'?'Bordj El Kiffan':l.area==='lespins'?'Les Pins':'Mohammadia'}</span>
+                    <span style="font-size:.72rem">${siteNote}</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+                ${l.phone?`<a class="btn btn-wa" href="https://wa.me/${l.phone.replace(/[^0-9]/g,'')}" target="_blank">💬 Open WhatsApp</a>`:'<span class="no-phone">No phone number</span>'}
+                <button class="detail-close" onclick="closeDetail()">✕ Close</button>
+            </div>
+        </div>
+        <div class="detail-body">
+            <div class="sales-flow">
+                <div class="sales-step active" onclick="showStep(this,'pitch')"><div class="step-num">Step 1</div><div class="step-label">📩 Send Pitch</div></div>
+                <div class="sales-step" onclick="showStep(this,'yes')"><div class="step-num">Step 2</div><div class="step-label">✅ They Say YES</div></div>
+                <div class="sales-step" onclick="showStep(this,'no')"><div class="step-num">Step 3</div><div class="step-label">❌ They Say NO</div></div>
+                <div class="sales-step" onclick="showStep(this,'follow')"><div class="step-num">Step 4</div><div class="step-label">🔄 Follow-Up</div></div>
+                <div class="sales-step" onclick="showStep(this,'close')"><div class="step-num">Step 5</div><div class="step-label">💰 Close & Collect</div></div>
+            </div>
+            <div id="stepContent">
+                ${renderPitchStep(l,openingPitch)}
+            </div>
+        </div>
+    `;
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function showStep(el,step){
+    el.parentElement.querySelectorAll('.sales-step').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+    const l = selectedLead;
+    const openingPitch = l.site==='outdated'?pitchTemplates[l.cat]?.outdated?.(l.name.split('—')[0].trim(),l.notes):pitchTemplates[l.cat]?.opening?.(l.name.split('—')[0].trim())||pitchTemplates.services.opening(l.name.split('—')[0].trim());
+    
+    const content = document.getElementById('stepContent');
+    if(step==='pitch') content.innerHTML = renderPitchStep(l,openingPitch);
+    else if(step==='yes') content.innerHTML = renderYesStep(l);
+    else if(step==='no') content.innerHTML = renderNoStep(l);
+    else if(step==='follow') content.innerHTML = renderFollowStep(l);
+    else if(step==='close') content.innerHTML = renderCloseStep(l);
+}
+
+function renderPitchStep(l,text){
+    return `
+        <div class="pitch-box">
+            <div class="pitch-box-title">📩 Opening Pitch — Send this first</div>
+            <div class="pitch-text">${text}</div>
+            <div class="pitch-actions">
+                <button class="btn btn-gold" onclick="copyText(this,\`${text.replace(/`/g,"'")}\`)">📋 Copy Pitch</button>
+                ${l.phone?`<a class="btn btn-wa" href="https://wa.me/${l.phone.replace(/[^0-9]/g,'')}" target="_blank">💬 Send on WhatsApp</a>`:''}
+            </div>
+        </div>
+    `;
+}
+
+function renderYesStep(l){
+    return `
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--green)">✅ They said YES — Collect info</div>
+            <div class="pitch-text">${responses.yes_next}</div>
+            <div class="pitch-actions"><button class="btn btn-green" onclick="copyText(this,\`${responses.yes_next.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--green)">✅ Sent mockup — Close the deal</div>
+            <div class="pitch-text">${responses.mockup_close}</div>
+            <div class="pitch-actions"><button class="btn btn-green" onclick="copyText(this,\`${responses.mockup_close.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--green)">💰 Price question — Value pitch</div>
+            <div class="pitch-text">${responses.price_question}</div>
+            <div class="pitch-actions"><button class="btn btn-green" onclick="copyText(this,\`${responses.price_question.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--green)">🤔 "Why do I need this?"</div>
+            <div class="pitch-text">${responses.why_needed}</div>
+            <div class="pitch-actions"><button class="btn btn-green" onclick="copyText(this,\`${responses.why_needed.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--green)">💸 "Can you do it cheaper?"</div>
+            <div class="pitch-text">${responses.cheaper}</div>
+            <div class="pitch-actions"><button class="btn btn-green" onclick="copyText(this,\`${responses.cheaper.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--green)">⏰ "How long does it take?"</div>
+            <div class="pitch-text">${responses.timeline}</div>
+            <div class="pitch-actions"><button class="btn btn-green" onclick="copyText(this,\`${responses.timeline.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+    `;
+}
+
+function renderNoStep(l){
+    return `
+        <div style="font-size:.82rem;color:var(--text2);margin-bottom:16px">Pick the objection they raised → copy the response:</div>
+        <div class="objection-grid">
+            <div class="objection-btn" onclick="showObjection(this,'expensive')"><div class="obj-label">💸 "Too expensive"</div><div class="obj-text">Click to see response →</div></div>
+            <div class="objection-btn" onclick="showObjection(this,'dontneed')"><div class="obj-label">🤷 "I don't need one"</div><div class="obj-text">Click to see response →</div></div>
+            <div class="objection-btn" onclick="showObjection(this,'facebook')"><div class="obj-label">📘 "I use Facebook"</div><div class="obj-text">Click to see response →</div></div>
+            <div class="objection-btn" onclick="showObjection(this,'later')"><div class="obj-label">⏳ "Maybe later"</div><div class="obj-text">Click to see response →</div></div>
+            <div class="objection-btn" onclick="showObjection(this,'think')"><div class="obj-label">🤔 "I'll think about it"</div><div class="obj-text">Click to see response →</div></div>
+            <div class="objection-btn" onclick="showObjection(this,'cheap')"><div class="obj-label">🤨 "Too cheap, don't trust it"</div><div class="obj-text">Click to see response →</div></div>
+            <div class="objection-btn" onclick="showObjection(this,'havesomeone')"><div class="obj-label">👤 "I already have someone"</div><div class="obj-text">Click to see response →</div></div>
+        </div>
+        <div id="objectionResponse"></div>
+    `;
+}
+
+function showObjection(el,key){
+    el.parentElement.querySelectorAll('.objection-btn').forEach(b=>b.style.borderColor='var(--border)');
+    el.style.borderColor='var(--red)';
+    const resp = responses['no_'+key];
+    document.getElementById('objectionResponse').innerHTML=`
+        <div class="pitch-box" style="margin-top:16px">
+            <div class="pitch-box-title" style="color:var(--red)">❌ Response</div>
+            <div class="pitch-text">${resp}</div>
+            <div class="pitch-actions"><button class="btn btn-red" onclick="copyText(this,\`${resp.replace(/`/g,"'")}\`)">📋 Copy Response</button></div>
+        </div>
+    `;
+}
+
+function renderFollowStep(l){
+    return `
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--yellow)">🔄 Day 2 — First follow-up</div>
+            <div class="pitch-text">${responses.follow_2d}</div>
+            <div class="pitch-actions"><button class="btn btn-yellow" onclick="copyText(this,\`${responses.follow_2d.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--yellow)">🔄 Day 5 — Second follow-up</div>
+            <div class="pitch-text">${responses.follow_5d}</div>
+            <div class="pitch-actions"><button class="btn btn-yellow" onclick="copyText(this,\`${responses.follow_5d.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--yellow)">🔄 Day 10 — Last chance</div>
+            <div class="pitch-text">${responses.follow_10d}</div>
+            <div class="pitch-actions"><button class="btn btn-yellow" onclick="copyText(this,\`${responses.follow_10d.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+    `;
+}
+
+function renderCloseStep(l){
+    return `
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--gold)">💰 Collect their info</div>
+            <div class="pitch-text">${responses.collect_info}</div>
+            <div class="pitch-actions"><button class="btn btn-gold" onclick="copyText(this,\`${responses.collect_info.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+        <div class="pitch-box">
+            <div class="pitch-box-title" style="color:var(--gold)">📅 Confirm timeline & payment</div>
+            <div class="pitch-text">${responses.confirm_timeline}</div>
+            <div class="pitch-actions"><button class="btn btn-gold" onclick="copyText(this,\`${responses.confirm_timeline.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+    `;
+}
+
+function closeDetail(){
+    document.getElementById('detailPanel').classList.remove('open');
+    selectedLead = null;
+    renderLeads();
+}
+
+// ==================== ALL PITCHES PAGE ====================
+let pitchFilterType = 'all';
+
+function renderAllPitches(){
+    const allPitches = [
+        {name:"Legal — Law Firm",cat:"legal",text:pitchTemplates.legal.opening("Maitre")},
+        {name:"Legal — Outdated Site",cat:"legal",text:pitchTemplates.legal.outdated("Maitre","theirsite.com")},
+        {name:"Food — Restaurant",cat:"food",text:pitchTemplates.food.opening("your restaurant")},
+        {name:"Food — Cafe",cat:"food",text:pitchTemplates.food.opening("your cafe")},
+        {name:"Hotel — Any Hotel",cat:"hotel",text:pitchTemplates.hotel.opening("your hotel")},
+        {name:"Medical — Doctor",cat:"medical",text:pitchTemplates.medical.opening("Docteur")},
+        {name:"Retail — Store",cat:"retail",text:pitchTemplates.retail.opening("your store")},
+        {name:"Services — Company",cat:"services",text:pitchTemplates.services.opening("your company")},
+    ];
+
+    const filtered = pitchFilterType==='all'?allPitches:allPitches.filter(p=>p.cat===pitchFilterType);
+
+    document.getElementById('allPitchGrid').innerHTML=filtered.map(p=>`
+        <div class="pitch-box">
+            <div class="pitch-box-title">${p.name}</div>
+            <div class="pitch-text">${p.text}</div>
+            <div class="pitch-actions"><button class="btn btn-gold" onclick="copyText(this,\`${p.text.replace(/`/g,"'")}\`)">📋 Copy</button></div>
+        </div>
+    `).join('');
+}
+
+function initPitchFilters(){
+    document.getElementById('pitchFilters').innerHTML=`
+        <button class="filter active" onclick="setPF('all',this)">All</button>
+        <button class="filter" onclick="setPF('legal',this)">Legal</button>
+        <button class="filter" onclick="setPF('food',this)">Food</button>
+        <button class="filter" onclick="setPF('hotel',this)">Hotels</button>
+        <button class="filter" onclick="setPF('medical',this)">Medical</button>
+        <button class="filter" onclick="setPF('retail',this)">Retail</button>
+        <button class="filter" onclick="setPF('services',this)">Services</button>
+    `;
+}
+
+function setPF(val,btn){
+    pitchFilterType=val;
+    document.querySelectorAll('#pitchFilters .filter').forEach(f=>f.classList.remove('active'));
+    btn.classList.add('active');
+    renderAllPitches();
+}
+
+// ==================== NAVIGATION ====================
+function showPage(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    event.target.classList.add('active');
+    if(id==='leads') closeDetail();
+}
+
+function copyText(btn,text){
+    navigator.clipboard.writeText(text);
+    btn.textContent='✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied')},2000);
+}
+
+// ==================== INIT ====================
+initLeadFilters();
+renderLeads();
+initPitchFilters();
+renderAllPitches();
+</script>
+</body>
+</html>
