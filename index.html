@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEX Studio — Upgrade Your Life</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Space Grotesk',sans-serif;background:#0A0A0A;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .bg{position:fixed;inset:0;z-index:0}
+        .bg::before{content:'';position:absolute;top:30%;left:20%;width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);border-radius:50%}
+        .bg::after{content:'';position:absolute;bottom:20%;right:25%;width:350px;height:350px;background:radial-gradient(circle,rgba(224,17,95,.06),transparent 70%);border-radius:50%}
+        .container{position:relative;z-index:1;text-align:center;padding:40px}
+        .logo{margin-bottom:20px}
+        .logo svg{margin:0 auto}
+        h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:700;margin-bottom:12px;background:linear-gradient(135deg,#C9A84C,#E8D48B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .sub{color:rgba(255,255,255,.35);font-size:1rem;margin-bottom:60px;letter-spacing:.05em}
+        .sites{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+        .site-card{width:300px;padding:40px 30px;border:1px solid rgba(255,255,255,.08);text-decoration:none;color:#fff;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden}
+        .site-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .4s}
+        .site-card:nth-child(1)::before{background:radial-gradient(circle at 50% 50%,rgba(201,168,76,.06),transparent 70%)}
+        .site-card:nth-child(2)::before{background:radial-gradient(circle at 50% 50%,rgba(255,107,44,.06),transparent 70%)}
+        .site-card:hover::before{opacity:1}
+        .site-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-8px)}
+        .site-card .icon{width:60px;height:60px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center}
+        .site-card h2{font-size:1.8rem;font-weight:700;margin-bottom:8px}
+        .site-card .tagline{font-size:.82rem;color:rgba(255,255,255,.35);margin-bottom:24px;line-height:1.5}
+        .site-card .enter{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;transition:color .3s}
+        .site-card:nth-child(1) h2{color:#C9A84C}
+        .site-card:nth-child(1) .enter{color:#C9A84C}
+        .site-card:nth-child(1):hover{border-color:rgba(201,168,76,.3)}
+        .site-card:nth-child(2) h2{color:#FF6B2C}
+        .site-card:nth-child(2) .enter{color:#FF6B2C}
+        .site-card:nth-child(2):hover{border-color:rgba(255,107,44,.3)}
+        .footer{text-align:center;margin-top:50px;font-size:.72rem;color:rgba(255,255,255,.15);letter-spacing:.1em}
+    </style>
+</head>
+<body>
+    <div class="bg"></div>
+    <div class="container">
+        <div class="logo">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+                <circle cx="24" cy="24" r="19" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity=".3"/>
+                <path d="M16 16L24 36L32 16" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+        </div>
+        <h1>VEX Studio</h1>
+        <div class="sub">Upgrade Your Life — Powered by VEX</div>
+        <div class="sites">
+            <a href="vex/" class="site-card">
+                <div class="icon">
+                    <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+                        <circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+                        <path d="M16 16L24 36L32 16" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+                <h2>VEX</h2>
+                <div class="tagline">Websites & Apps. Handcrafted with precision.</div>
+                <div class="enter">Enter VEX →</div>
+            </a>
+            <a href="onyx/" class="site-card">
+                <div class="icon">
+                    <svg width="34" height="40" viewBox="0 0 44 48" fill="none">
+                        <path d="M22 2L42 14V30C42 38 34 44 22 48C10 44 2 38 2 30V14L22 2Z" stroke="#FF6B2C" stroke-width="1.5" fill="none"/>
+                        <path d="M22 18V32" stroke="#FF6B2C" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M15 25H29" stroke="#FF6B2C" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2>ONYX</h2>
+                <div class="tagline">AI Ads & Cybersecurity. Powered by VEX.</div>
+                <div class="enter">Enter ONYX →</div>
+            </a>
+        </div>
+        <div class="footer">© 2026 VEX Studio. All rights reserved.</div>
+    </div>
+</body>
+</html>

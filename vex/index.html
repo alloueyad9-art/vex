@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEX — Upgrade Your Life</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --gold:#C9A84C; --gold-light:#E8D48B; --gold-dark:#A07E2B;
+            --white:#FFF; --cream:#FAF8F2; --dark:#0A0A0A; --dark-soft:#111;
+            --text:#1A1A1A; --text-light:#666;
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+        /* PRELOADER */
+        .preloader{position:fixed;inset:0;background:var(--dark);z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .8s,visibility .8s}
+        .preloader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+        .preloader-logo{font-family:'Space Grotesk',sans-serif;font-size:3.5rem;font-weight:700;background:linear-gradient(90deg,#C9A84C,#E8D48B,#C9A84C);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2s linear infinite}
+        .preloader-bar{width:200px;height:2px;background:rgba(201,168,76,.2);overflow:hidden}
+        .preloader-bar::after{content:'';display:block;width:0;height:100%;background:var(--gold);animation:load 1.8s ease forwards}
+        @keyframes shimmer{to{background-position:200% center}}
+        @keyframes load{to{width:100%}}
+
+        /* NAV */
+        nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px 60px;display:flex;align-items:center;justify-content:space-between;transition:all .4s;background:transparent}
+        nav.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(20px);padding:14px 60px;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+        nav.scrolled .nav-logo,nav.scrolled .nav-links a,nav.scrolled .nav-cta{color:var(--text)}
+        nav.scrolled .nav-cta{border-color:var(--gold);color:var(--gold)}
+        .nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;color:var(--white);text-decoration:none;letter-spacing:-.03em}
+        .nav-logo span{color:var(--gold)}
+        .nav-links{display:flex;gap:36px;align-items:center}
+        .nav-links a{font-size:.82rem;font-weight:500;color:rgba(255,255,255,.7);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:color .3s}
+        .nav-links a:hover{color:var(--gold)}
+        .nav-cta{padding:10px 28px;border:1.5px solid rgba(255,255,255,.25);color:var(--white);text-decoration:none;font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:all .3s}
+        .nav-cta:hover{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+        nav.scrolled .nav-links a[href*="NEXUS"]{color:var(--gold);border-color:var(--gold)}
+
+        /* HERO */
+        .hero{min-height:100vh;background:var(--dark);display:flex;align-items:center;position:relative;overflow:hidden}
+        .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,168,76,.07) 0%,transparent 60%)}
+        .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.03) 1px,transparent 1px);background-size:80px 80px}
+        .hero-content{position:relative;z-index:2;max-width:650px;padding:0 60px;animation:fadeUp .8s ease 1.5s both}
+        .hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 24px;border:1px solid rgba(201,168,76,.3);font-size:.72rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:40px}
+        .hero-badge::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s ease infinite}
+        .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:900;line-height:1.05;color:var(--white);margin-bottom:30px}
+        .hero h1 .gold{color:var(--gold)}
+        .hero p{font-size:1.1rem;color:rgba(255,255,255,.45);max-width:500px;line-height:1.7;font-weight:300;margin-bottom:40px}
+        .hero-buttons{display:flex;gap:20px}
+        .hero-img{position:absolute;right:0;top:50%;transform:translateY(-50%);width:50%;height:100%;object-fit:cover;opacity:.3;mask-image:linear-gradient(to left,rgba(0,0,0,.6),transparent);-webkit-mask-image:linear-gradient(to left,rgba(0,0,0,.6),transparent)}
+        .btn-primary{padding:16px 44px;background:var(--gold);color:var(--dark);font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:all .3s;border:none;cursor:pointer}
+        .btn-primary:hover{background:var(--gold-light);transform:translateY(-2px)}
+        .btn-secondary{padding:16px 44px;background:transparent;color:var(--white);font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:1.5px solid rgba(255,255,255,.2);transition:all .3s}
+        .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+        .hero-scroll{position:absolute;bottom:40px;left:60px;display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.25);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase}
+        .hero-scroll .line{width:40px;height:1px;background:var(--gold);animation:scrollLine 2s ease infinite}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        @keyframes scrollLine{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+
+        /* SECTIONS */
+        section{padding:120px 60px}
+        .section-header{text-align:center;margin-bottom:80px}
+        .section-tag{font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:block}
+        .section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.2}
+        .section-title .gold{color:var(--gold)}
+        .section-sub{font-size:1.05rem;color:var(--text-light);margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.7;font-weight:300}
+
+        /* SERVICES */
+        .services{background:var(--white)}
+        .services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:30px;max-width:1000px;margin:0 auto}
+        .service-card{display:grid;grid-template-columns:auto 1fr;gap:30px;padding:50px 40px;border:1px solid rgba(0,0,0,.06);transition:all .4s;position:relative;background:var(--white);align-items:start}
+        .service-card:hover{border-color:var(--gold);transform:translateY(-6px);box-shadow:0 30px 60px rgba(0,0,0,.06)}
+        .service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transition:transform .4s}
+        .service-card:hover::before{transform:scaleX(1)}
+        .service-img{width:220px;height:160px;object-fit:cover;border:1px solid rgba(0,0,0,.05)}
+        .service-card h3{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:600;margin-bottom:12px}
+        .service-card p{font-size:.9rem;color:var(--text-light);line-height:1.7;margin-bottom:16px}
+        .service-price{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--gold-dark);font-size:.9rem}
+        .service-price span{font-size:1.6rem;color:var(--gold)}
+
+        /* PORTFOLIO */
+        .portfolio{background:var(--dark)}
+        .portfolio .section-title{color:var(--white)}
+        .portfolio .section-sub{color:rgba(255,255,255,.4)}
+        .portfolio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:1200px;margin:0 auto}
+        .portfolio-item{position:relative;overflow:hidden;aspect-ratio:4/3;cursor:pointer}
+        .portfolio-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+        .portfolio-item:hover img{transform:scale(1.08)}
+        .portfolio-item .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.9) 0%,transparent 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px;opacity:0;transition:opacity .4s}
+        .portfolio-item:hover .overlay{opacity:1}
+        .portfolio-item h4{font-family:'Space Grotesk',sans-serif;color:var(--white);font-size:1rem;margin-bottom:4px}
+        .portfolio-item .tag{font-size:.7rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+
+        /* HOW WE WORK */
+        .how{background:var(--cream)}
+        .how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:1100px;margin:0 auto}
+        .how-step{text-align:center;padding:40px 20px;position:relative}
+        .how-step::after{content:'→';position:absolute;right:-15px;top:50%;transform:translateY(-50%);font-size:1.5rem;color:var(--gold)}
+        .how-step:last-child::after{display:none}
+        .step-num{width:60px;height:60px;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--gold)}
+        .how-step h4{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;margin-bottom:12px}
+        .how-step p{font-size:.86rem;color:var(--text-light);line-height:1.6}
+
+        /* AI SECTION - only for cyber + ads */
+        .ai-section{background:var(--white);position:relative}
+        .ai-split{display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1100px;margin:0 auto;align-items:center}
+        .ai-text .ai-tag{font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:block}
+        .ai-text h3{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;line-height:1.2;margin-bottom:20px}
+        .ai-text p{color:var(--text-light);line-height:1.7;margin-bottom:24px}
+        .ai-features{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .ai-features li{font-size:.88rem;display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+        .ai-features li::before{content:'◈';color:var(--gold);font-size:.75rem}
+        .ai-img{width:100%;aspect-ratio:4/3;object-fit:cover;border:1px solid rgba(0,0,0,.06)}
+
+        /* STATS */
+        .stats{background:var(--dark);padding:80px 60px}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;max-width:1000px;margin:0 auto;text-align:center}
+        .stat h3{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:var(--gold);margin-bottom:8px}
+        .stat p{font-size:.78rem;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase}
+
+        /* PRICING */
+        .pricing{background:var(--cream)}
+        .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;max-width:1100px;margin:0 auto}
+        .price-card{background:var(--white);padding:48px 36px;border:1px solid rgba(0,0,0,.06);transition:all .4s;position:relative}
+        .price-card.featured{border-color:var(--gold);transform:scale(1.04);box-shadow:0 30px 80px rgba(201,168,76,.12)}
+        .price-card.featured::before{content:'MOST POPULAR';position:absolute;top:-1px;left:0;right:0;background:var(--gold);color:var(--dark);text-align:center;padding:8px;font-size:.68rem;font-weight:700;letter-spacing:.15em}
+        .price-card:hover{transform:translateY(-5px);box-shadow:0 20px 60px rgba(0,0,0,.08)}
+        .price-card.featured:hover{transform:scale(1.04) translateY(-5px)}
+        .price-card .tier{font-size:.78rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+        .price-card .price{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;margin-bottom:8px}
+        .price-card .price span{font-size:1.1rem;font-weight:400;color:var(--text-light)}
+        .price-card .desc{font-size:.88rem;color:var(--text-light);margin-bottom:28px;line-height:1.6}
+        .price-card ul{list-style:none;margin-bottom:32px}
+        .price-card li{padding:9px 0;font-size:.88rem;border-bottom:1px solid rgba(0,0,0,.04);display:flex;align-items:center;gap:10px}
+        .price-card li::before{content:'✓';color:var(--gold);font-weight:700}
+        .price-card .btn-price{display:block;width:100%;padding:13px;text-align:center;font-weight:600;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;transition:all .3s;border:1.5px solid var(--text);color:var(--text);background:transparent;cursor:pointer}
+        .price-card .btn-price:hover{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+        .price-card.featured .btn-price{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+        .price-card.featured .btn-price:hover{background:var(--gold-dark)}
+        .budget-section{max-width:700px;margin:60px auto 0;text-align:center}
+        .budget-section h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:10px}
+        .budget-section p{color:var(--text-light);font-size:.92rem;margin-bottom:30px}
+        .budget-slider{width:100%;-webkit-appearance:none;height:4px;background:linear-gradient(to right,var(--gold) 0%,var(--gold) var(--val,50%),#e0e0e0 var(--val,50%),#e0e0e0 100%);outline:none;border-radius:4px}
+        .budget-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;background:var(--gold);border-radius:50%;cursor:pointer;box-shadow:0 4px 15px rgba(201,168,76,.4);transition:transform .2s}
+        .budget-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
+        .budget-display{margin-top:20px;font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;color:var(--gold)}
+        .budget-display span{font-size:1rem;color:var(--text-light);font-family:'Inter',sans-serif;font-weight:400}
+        .budget-labels{display:flex;justify-content:space-between;margin-top:10px;font-size:.72rem;color:var(--text-light)}
+
+        /* TESTIMONIALS */
+        .testimonials{background:var(--white)}
+        .testimonial-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;max-width:1000px;margin:0 auto}
+        .testimonial-card{background:var(--cream);padding:40px}
+        .testimonial-card .stars{color:var(--gold);font-size:1rem;margin-bottom:18px;letter-spacing:3px}
+        .testimonial-card blockquote{font-size:.95rem;line-height:1.7;margin-bottom:22px;font-style:italic}
+        .testimonial-card .author{display:flex;align-items:center;gap:14px}
+        .testimonial-card .avatar{width:44px;height:44px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--dark);font-size:.85rem}
+        .testimonial-card .name{font-weight:600;font-size:.88rem}
+        .testimonial-card .role{font-size:.78rem;color:var(--text-light)}
+
+        /* CTA */
+        .cta{background:var(--dark);padding:140px 60px;text-align:center;position:relative;overflow:hidden}
+        .cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(201,168,76,.08) 0%,transparent 60%)}
+        .cta h2{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:900;color:var(--white);margin-bottom:24px;position:relative}
+        .cta p{color:rgba(255,255,255,.4);font-size:1.05rem;margin-bottom:40px;max-width:500px;margin-left:auto;margin-right:auto;position:relative;line-height:1.7}
+        .cta .btn-primary{position:relative}
+
+        /* CONTACT */
+        .contact{background:var(--cream)}
+        .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1100px;margin:0 auto}
+        .contact-info h3{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:20px;line-height:1.2}
+        .contact-info>p{color:var(--text-light);line-height:1.7;margin-bottom:30px}
+        .contact-detail{display:flex;align-items:center;gap:16px;margin-bottom:20px;font-size:.92rem}
+        .contact-detail .icon{width:44px;height:44px;background:var(--white);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+        .contact-form{display:flex;flex-direction:column;gap:18px}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+        .contact-form input,.contact-form select,.contact-form textarea{width:100%;padding:14px 18px;border:1px solid rgba(0,0,0,.1);font-family:'Inter',sans-serif;font-size:.88rem;transition:border-color .3s;background:var(--white);outline:none}
+        .contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus{border-color:var(--gold)}
+        .contact-form textarea{resize:vertical;min-height:120px}
+        .contact-form select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+
+        /* FOOTER */
+        footer{background:var(--dark);padding:60px}
+        .footer-content{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+        .footer-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.3rem;color:var(--white)}
+        .footer-logo span{color:var(--gold)}
+        .footer-links{display:flex;gap:28px}
+        .footer-links a{color:rgba(255,255,255,.35);text-decoration:none;font-size:.82rem;transition:color .3s}
+        .footer-links a:hover{color:var(--gold)}
+        .footer-copy{color:rgba(255,255,255,.15);font-size:.78rem;text-align:center;margin-top:40px;padding-top:30px;border-top:1px solid rgba(255,255,255,.05);max-width:1200px;margin-left:auto;margin-right:auto}
+
+        .reveal{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.16,1,.3,1)}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+
+        @media(max-width:1024px){
+            section{padding:80px 30px}nav{padding:16px 30px}
+            .services-grid,.testimonial-grid{grid-template-columns:1fr;max-width:550px;margin:0 auto}
+            .service-card{grid-template-columns:1fr}.service-img{width:100%;height:200px}
+            .portfolio-grid{grid-template-columns:repeat(2,1fr)}
+            .how-grid{grid-template-columns:repeat(2,1fr)}.how-step::after{display:none}
+            .ai-split{grid-template-columns:1fr}
+            .pricing-grid{grid-template-columns:1fr;max-width:450px;margin:0 auto}
+            .price-card.featured{transform:none}.price-card.featured:hover{transform:translateY(-5px)}
+            .stats-grid{grid-template-columns:repeat(2,1fr)}
+            .contact-grid{grid-template-columns:1fr;gap:40px}
+            .footer-content{flex-direction:column;gap:20px;text-align:center}
+            .form-row{grid-template-columns:1fr}
+            .hero-img{display:none}
+        }
+        @media(max-width:640px){
+            .hero h1{font-size:2.3rem}
+            .hero-buttons{flex-direction:column;align-items:flex-start}
+            .nav-links{display:none}
+            .portfolio-grid{grid-template-columns:1fr}
+            .how-grid,.stats-grid{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+
+<div class="preloader" id="preloader">
+    <div class="preloader-logo" style="display:flex;align-items:center;gap:14px"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="19" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity=".3"/><path d="M16 16L24 36L32 16" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16 16L24 36L32 16" fill="#C9A84C" opacity=".05"/></svg><span style="letter-spacing:.15em;font-family:'Space Grotesk',sans-serif">VEX</span></div>
+    <div class="preloader-bar"></div>
+</div>
+
+<nav id="navbar">
+    <a href="#" class="nav-logo" style="display:flex;align-items:center;gap:10px"><svg width="28" height="28" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.8" fill="none"/><path d="M16 16L24 36L32 16" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="letter-spacing:.08em">VEX<span style="color:#C9A84C">.</span></span></a>
+    <div class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#work">Work</a>
+        <a href="#ai">AI Tools</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+        <a href="../onyx/" style="border:1px solid var(--gold);padding:6px 14px;border-radius:0">Explore ONYX</a>
+    </div>
+    <a href="#contact" class="nav-cta">Start a Project</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-grid"></div>
+    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80" alt="" class="hero-img">
+    <div class="hero-content">
+        <div class="hero-badge">✦ Powered by VEX</div>
+        <h1>Upgrade Your<br><span class="gold">Life</span></h1>
+        <p>Powered by VEX — premium websites, mobile apps, cybersecurity, and AI-driven growth. All crafted by hand, not templates.</p>
+        <div class="hero-buttons">
+            <a href="#pricing" class="btn-primary">View Pricing</a>
+            <a href="#work" class="btn-secondary">See Our Work</a>
+        </div>
+    </div>
+    <div class="hero-scroll"><div class="line"></div><span>Scroll</span></div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+    <div class="section-header reveal">
+        <span class="section-tag">What We Do</span>
+        <h2 class="section-title">Crafted With <span class="gold">Precision</span></h2>
+        <p class="section-sub">Every line of code, every pixel, every strategy — built by our team, not machines.</p>
+    </div>
+    <div class="services-grid">
+        <div class="service-card reveal">
+            <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&q=80" alt="Web Development" class="service-img">
+            <div>
+                <h3>Website Development</h3>
+                <p>Custom-coded, responsive websites that convert visitors into customers. From landing pages to full e-commerce platforms.</p>
+                <div class="service-price">From <span>€750</span></div>
+            </div>
+        </div>
+        <div class="service-card reveal">
+            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&q=80" alt="App Development" class="service-img">
+            <div>
+                <h3>App Development</h3>
+                <p>Native and cross-platform mobile apps for iOS and Android. Smooth, fast, and built to scale.</p>
+                <div class="service-price">From <span>€2,000</span></div>
+            </div>
+        </div>
+        <a href="../onyx/" class="service-card reveal" style="text-decoration:none;color:inherit;cursor:pointer;position:relative">
+            <div style="position:absolute;top:12px;right:16px;background:var(--gold);color:var(--dark);padding:4px 10px;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'Space Grotesk',sans-serif;z-index:2">Explore ONYX for best deals</div>
+            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80" alt="Cybersecurity" class="service-img">
+            <div>
+                <h3>Cybersecurity <span style="font-size:.6rem;color:var(--gold);border:1px solid var(--gold);padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:'Space Grotesk',sans-serif">POWERED BY ONYX</span></h3>
+                <p>AI-powered threat detection, penetration testing, and 24/7 monitoring. We protect your digital assets.</p>
+                <div class="service-price">From <span>€1,500</span></div>
+                <div style="margin-top:12px;font-size:.75rem;color:var(--gold);font-weight:600">Click to explore ONYX →</div>
+            </div>
+        </a>
+        <a href="../onyx/" class="service-card reveal" style="text-decoration:none;color:inherit;cursor:pointer;position:relative">
+            <div style="position:absolute;top:12px;right:16px;background:var(--gold);color:var(--dark);padding:4px 10px;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'Space Grotesk',sans-serif;z-index:2">Explore ONYX for best deals</div>
+            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&q=80" alt="AI Ads" class="service-img">
+            <div>
+                <h3>AI-Powered Ads <span style="font-size:.6rem;color:var(--gold);border:1px solid var(--gold);padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:'Space Grotesk',sans-serif">POWERED BY ONYX</span></h3>
+                <p>Machine-learning optimized ad campaigns. AI writes, designs, and optimizes — we strategize and oversee.</p>
+                <div class="service-price">From <span>€1,000</span></div>
+                <div style="margin-top:12px;font-size:.75rem;color:var(--gold);font-weight:600">Click to explore ONYX →</div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section class="portfolio" id="work">
+    <div class="section-header reveal">
+        <span class="section-tag">Portfolio</span>
+        <h2 class="section-title">Selected <span class="gold">Work</span></h2>
+        <p class="section-sub">Every project is handcrafted. Here's a glimpse of what we build.</p>
+    </div>
+    <div class="portfolio-grid">
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">Website</span><h4>Nova E-Commerce</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">Mobile App</span><h4>FinTrack App</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">Dashboard</span><h4>Analytics Platform</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">E-Commerce</span><h4>Luxe Store</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1555421689-d68471e189f2?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">Website</span><h4>Agency Site</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">Mobile App</span><h4>Social App</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">SaaS</span><h4>CloudMetrics</h4></div>
+        </div>
+        <div class="portfolio-item reveal">
+            <img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&q=80" alt="Project">
+            <div class="overlay"><span class="tag">Landing Page</span><h4>Startup Launch</h4></div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW WE WORK -->
+<section class="how" id="process">
+    <div class="section-header reveal">
+        <span class="section-tag">Process</span>
+        <h2 class="section-title">How We <span class="gold">Work</span></h2>
+    </div>
+    <div class="how-grid">
+        <div class="how-step reveal">
+            <div class="step-num">01</div>
+            <h4>Discovery</h4>
+            <p>We learn your business, goals, and vision in detail.</p>
+        </div>
+        <div class="how-step reveal">
+            <div class="step-num">02</div>
+            <h4>Design</h4>
+            <p>Our designers craft wireframes and mockups by hand.</p>
+        </div>
+        <div class="how-step reveal">
+            <div class="step-num">03</div>
+            <h4>Develop</h4>
+            <p>Clean, performant code — no templates, no shortcuts.</p>
+        </div>
+        <div class="how-step reveal">
+            <div class="step-num">04</div>
+            <h4>Launch</h4>
+            <p>Testing, optimization, and deployment. We handle it all.</p>
+        </div>
+    </div>
+</section>
+
+<!-- AI TOOLS - only cyber + ads -->
+<section class="ai-section" id="ai">
+    <div class="ai-split">
+        <div class="ai-text reveal">
+            <span class="ai-tag">Where We Use AI</span>
+            <div style="margin-top:10px"><a href="../onyx/" style="display:inline-block;padding:8px 20px;border:1px solid var(--gold);color:var(--gold);text-decoration:none;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:all .3s;font-family:'Space Grotesk',sans-serif">Explore ONYX →</a></div>
+            <h3>Smart Where It<br>Matters. <span style="color:var(--gold)">Human</span> Where It Counts.</h3>
+            <p>We don't use AI to build your website or app — our team does that by hand. But for cybersecurity and ad campaigns, we deploy AI through our specialized brand <strong style="color:var(--gold)">ONYX</strong> to give you an unfair advantage.</p>
+            <ul class="ai-features">
+                <li>AI threat detection & monitoring</li>
+                <li>Automated vulnerability scanning</li>
+                <li>AI-optimized ad creatives</li>
+                <li>Machine-learning bid optimization</li>
+                <li>Real-time campaign adjustments</li>
+                <li>Predictive audience targeting</li>
+            </ul>
+        </div>
+        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80" alt="AI Technology" class="ai-img reveal">
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+    <div class="stats-grid">
+        <div class="stat reveal"><h3>120+</h3><p>Projects Delivered</p></div>
+        <div class="stat reveal"><h3>98%</h3><p>Client Satisfaction</p></div>
+        <div class="stat reveal"><h3>0</h3><p>Security Breaches</p></div>
+        <div class="stat reveal"><h3>24/7</h3><p>Support Available</p></div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+    <div class="section-header reveal">
+        <span class="section-tag">Pricing</span>
+        <h2 class="section-title">Honest <span class="gold">Pricing</span></h2>
+        <p class="section-sub">No hidden fees. No surprises. Premium quality at fair prices.</p>
+    </div>
+    <div class="pricing-grid">
+        <div class="price-card reveal">
+            <div class="tier">Starter</div>
+            <div class="price-tabs" style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid rgba(0,0,0,.08)">
+                <button class="price-tab active" onclick="switchTab(this,'s-monthly','s-yearly')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--gold);font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--gold);font-family:'Space Grotesk',sans-serif">Monthly</button>
+                <button class="price-tab" onclick="switchTab(this,'s-yearly','s-monthly')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text-light);font-family:'Space Grotesk',sans-serif">Yearly <span style="color:#22c55e;font-size:.6rem">-20%</span></button>
+            </div>
+            <div id="s-monthly" class="price-content"><div class="price">€750<span style="font-size:.8rem;color:var(--text-light);font-weight:400"> / project</span></div></div>
+            <div id="s-yearly" class="price-content" style="display:none"><div style="text-decoration:line-through;color:var(--text-light);font-size:1rem;margin-bottom:4px">€750</div><div class="price" style="color:#22c55e">€600<span style="font-size:.8rem;color:var(--text-light);font-weight:400"> / project</span></div><div style="font-size:.7rem;color:var(--text-light);margin-top:4px">Save €150 with yearly</div></div>
+            <div class="desc">Perfect for small businesses needing a professional online presence.</div>
+            <ul>
+                <li>Custom website (up to 5 pages)</li>
+                <li>Responsive design</li>
+                <li>SEO optimization</li>
+                <li>Contact form integration</li>
+                <li>2 revision rounds</li>
+                <li>7-day delivery</li>
+            </ul>
+            <a href="#contact" class="btn-price">Get Started</a>
+        </div>
+        <div class="price-card featured reveal">
+            <div class="tier">Professional</div>
+            <div class="price-tabs" style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid rgba(0,0,0,.08)">
+                <button class="price-tab active" onclick="switchTab(this,'p-monthly','p-yearly')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--gold);font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--gold);font-family:'Space Grotesk',sans-serif">Monthly</button>
+                <button class="price-tab" onclick="switchTab(this,'p-yearly','p-monthly')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text-light);font-family:'Space Grotesk',sans-serif">Yearly <span style="color:#22c55e;font-size:.6rem">-25%</span></button>
+            </div>
+            <div id="p-monthly" class="price-content"><div class="price">€3,000<span style="font-size:.8rem;color:var(--text-light);font-weight:400"> / project</span></div></div>
+            <div id="p-yearly" class="price-content" style="display:none"><div style="text-decoration:line-through;color:var(--text-light);font-size:1rem;margin-bottom:4px">€3,000</div><div class="price" style="color:#22c55e">€2,250<span style="font-size:.8rem;color:var(--text-light);font-weight:400"> / project</span></div><div style="font-size:.7rem;color:var(--text-light);margin-top:4px">Save €750 with yearly</div></div>
+            <div class="desc">For serious businesses that need websites, apps, or both.</div>
+            <ul>
+                <li>Custom website (unlimited pages)</li>
+                <li>Mobile app (iOS or Android)</li>
+                <li>CMS / Admin dashboard</li>
+                <li>Basic cybersecurity audit</li>
+                <li>AI ad campaign setup</li>
+                <li>Unlimited revisions</li>
+                <li>30-day support</li>
+            </ul>
+            <a href="#contact" class="btn-price">Get Started</a>
+        </div>
+        <div class="price-card reveal">
+            <div class="tier">Enterprise</div>
+            <div class="price-tabs" style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid rgba(0,0,0,.08)">
+                <button class="price-tab active" onclick="switchTab(this,'e-monthly','e-yearly')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--gold);font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--gold);font-family:'Space Grotesk',sans-serif">Monthly</button>
+                <button class="price-tab" onclick="switchTab(this,'e-yearly','e-monthly')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text-light);font-family:'Space Grotesk',sans-serif">Yearly <span style="color:#22c55e;font-size:.6rem">-30%</span></button>
+            </div>
+            <div id="e-monthly" class="price-content"><div class="price">€10,000<span style="font-size:.8rem;color:var(--text-light);font-weight:400"> / project</span></div></div>
+            <div id="e-yearly" class="price-content" style="display:none"><div style="text-decoration:line-through;color:var(--text-light);font-size:1rem;margin-bottom:4px">€10,000</div><div class="price" style="color:#22c55e">€7,000<span style="font-size:.8rem;color:var(--text-light);font-weight:400"> / project</span></div><div style="font-size:.7rem;color:var(--text-light);margin-top:4px">Save €3,000 with yearly</div></div>
+            <div class="desc">Full digital presence. Web, app, security, and growth — all included.</div>
+            <ul>
+                <li>Everything in Professional</li>
+                <li>Cross-platform app (iOS + Android)</li>
+                <li>Full cybersecurity suite</li>
+                <li>24/7 threat monitoring</li>
+                <li>AI ad campaign management</li>
+                <li>Priority support & maintenance</li>
+                <li>Dedicated project manager</li>
+            </ul>
+            <a href="#contact" class="btn-price">Get Started</a>
+        </div>
+    </div>
+    <div class="budget-section reveal">
+        <h3>Your Budget</h3>
+        <p>Slide to set your budget and we'll build a plan around it</p>
+        <input type="range" class="budget-slider" id="budgetSlider" min="750" max="10000" value="3000" step="250">
+        <div class="budget-display" id="budgetDisplay">€3,000</div>
+        <div class="budget-labels"><span>€750</span><span>€10,000</span></div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+    <div class="section-header reveal">
+        <span class="section-tag">Reviews</span>
+        <h2 class="section-title">What Clients <span class="gold">Say</span></h2>
+    </div>
+    <div class="testimonial-grid">
+        <div class="testimonial-card reveal">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"VEX built our entire e-commerce platform from scratch. The code is clean, the design is beautiful, and it loads fast. Best investment we've made."</blockquote>
+            <div class="author"><div class="avatar">MR</div><div><div class="name">Marc R.</div><div class="role">CEO, Luxe Store</div></div></div>
+        </div>
+        <div class="testimonial-card reveal">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"Our app hit 10K downloads in the first month. VEX didn't just build it — they understood our vision and made it better than we imagined."</blockquote>
+            <div class="author"><div class="avatar">SK</div><div><div class="name">Sophie K.</div><div class="role">Founder, FinTrack</div></div></div>
+        </div>
+        <div class="testimonial-card reveal">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"They found security vulnerabilities we had no idea existed. The AI threat monitoring they set up gives us total peace of mind."</blockquote>
+            <div class="author"><div class="avatar">TP</div><div><div class="name">Thomas P.</div><div class="role">CTO, DataVault</div></div></div>
+        </div>
+        <div class="testimonial-card reveal">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"€750 for a website that looks like it cost €5,000. And the AI ad campaign they set up paid for itself in the first week. Incredible value."</blockquote>
+            <div class="author"><div class="avatar">LB</div><div><div class="name">Laura B.</div><div class="role">Marketing Lead, Nova</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta"><h2>Ready to <span style="color:var(--gold)">Upgrade</span><br>Your Life?</h2>
+        <p>Websites, apps, security, and growth — all crafted by real humans who care about your success.</p>
+    <a href="#contact" class="btn-primary">Start Your Project</a>
+    <div style="margin-top:20px"><a href="../onyx/" style="color:var(--gold);text-decoration:none;font-size:.8rem;font-weight:600">Or explore ONYX for AI Ads & Cybersecurity →</a></div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+    <div class="section-header reveal">
+        <span class="section-tag">Contact</span>
+        <h2 class="section-title">Let's <span class="gold">Talk</span></h2>
+    </div>
+    <div class="contact-grid">
+        <div class="contact-info reveal">
+            <h3>Tell us about your<br>project.</h3>
+            <p>We respond within 24 hours. No sales calls — just honest conversation about your goals.</p>
+            <div class="contact-detail"><div class="icon">✉</div><span>hello@vex.studio</span></div>
+            <div class="contact-detail"><div class="icon">💬</div><span>Discord: VEXStudio</span></div>
+            <div class="contact-detail"><div class="icon">📍</div><span>Available Worldwide</span></div>
+        </div>
+        <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+            <div class="form-row">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Email Address" required>
+            </div>
+            <select required>
+                <option value="" disabled selected>What do you need?</option>
+                <option>Website Development</option>
+                <option>App Development</option>
+                <option>Cybersecurity</option>
+                <option>AI Ad Campaign</option>
+                <option>Full Package (Web + App + Security + Ads)</option>
+            </select>
+            <select id="budgetSelect">
+                <option value="" disabled selected>Your Budget</option>
+                <option>€750</option>
+                <option>€1,000</option>
+                <option>€1,500</option>
+                <option>€2,000</option>
+                <option>€2,500</option>
+                <option>€3,000</option>
+                <option>€4,000</option>
+                <option>€5,000</option>
+                <option>€7,500</option>
+                <option>€10,000</option>
+            </select>
+            <textarea placeholder="Tell us about your project..." required></textarea>
+            <button type="submit" class="btn-primary" style="width:100%;text-align:center;">Send Message</button>
+        </form>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-logo" style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.8" fill="none"/><path d="M16 16L24 36L32 16" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>VEX<span style="color:#C9A84C">.</span></div>
+        <div class="footer-links">
+            <a href="#services">Services</a>
+            <a href="#work">Work</a>
+            <a href="#ai">AI Tools</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#contact">Contact</a>
+            <a href="../onyx/" style="color:var(--gold)">ONYX</a>
+        </div>
+    </div>
+    <div class="footer-copy">© 2026 VEX Studio. All rights reserved. Handcrafted with care.</div>
+</footer>
+
+<script>
+    window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('preloader').classList.add('hidden'),2000)});
+    const navbar=document.getElementById('navbar');
+    window.addEventListener('scroll',()=>navbar.classList.toggle('scrolled',window.scrollY>50));
+    const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
+    document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+    const slider=document.getElementById('budgetSlider'),display=document.getElementById('budgetDisplay'),budgetSelect=document.getElementById('budgetSelect');
+    function updateSlider(){const v=parseInt(slider.value),p=((v-750)/(10000-750))*100;slider.style.setProperty('--val',p+'%');display.textContent='€'+v.toLocaleString();for(let i=0;i<budgetSelect.options.length;i++){if(parseInt(budgetSelect.options[i].text.replace(/[^0-9]/g,''))===v){budgetSelect.selectedIndex=i;break}}}
+    slider.addEventListener('input',updateSlider);updateSlider();
+    function handleSubmit(e){e.preventDefault();const b=e.target.querySelector('button');b.textContent='✓ SENT!';b.style.background='#2ecc71';b.style.borderColor='#2ecc71';b.style.color='#fff';setTimeout(()=>{b.textContent='SEND MESSAGE';b.style.background='';b.style.borderColor='';b.style.color='';e.target.reset()},3000)}
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+function switchTab(btn,showId,hideId){
+        const show=document.getElementById(showId),hide=document.getElementById(hideId);
+        if(show)show.style.display='block';
+        if(hide)hide.style.display='none';
+        const tabs=btn.parentElement.querySelectorAll('.price-tab');
+        tabs.forEach(t=>{t.style.borderBottomColor='transparent';t.style.color='var(--text-light)'});
+        btn.style.borderBottomColor='var(--gold)';
+        btn.style.color='var(--gold)';
+    }
+</script>
+</body>
+</html>

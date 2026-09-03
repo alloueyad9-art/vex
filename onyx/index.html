@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONYX — AI Ads & Cybersecurity</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--lime:#FF6B2C;--lime-dim:rgba(255,107,44,.08);--lime-glow:rgba(255,107,44,.04);--ruby:#E0115F;--ruby-glow:rgba(224,17,95,.06);--lava:#FF4500;--silver:#C0C0C0;--gold:#FFD700;--navy:#060208;--navy-light:#0C0410;--navy-card:#100515;--border:rgba(255,255,255,.05);--white:#F0ECE8;--text:#6A5A52;--text2:#9A8A82}
+html{scroll-behavior:smooth;overflow-x:hidden;background:#060208}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased;max-width:100vw}
+::selection{background:rgba(255,107,44,.2);color:var(--white)}
+
+/* GRAIN */
+.grain{position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* CURSOR */
+.cur{position:fixed;width:14px;height:14px;border:1.5px solid var(--lime);border-radius:50%;pointer-events:none;z-index:9999;transition:width .3s cubic-bezier(.16,1,.3,1),height .3s,background .3s,border-color .3s;transform:translate(-50%,-50%);mix-blend-mode:difference;box-shadow:0 0 10px rgba(255,107,44,.3)}
+.cur-dot{position:fixed;width:3px;height:3px;background:var(--white);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+.cur.hover{width:52px;height:52px;background:rgba(255,107,44,.06);border-color:rgba(255,107,44,.3)}
+
+/* PRELOADER */
+.preloader{position:fixed;inset:0;background:var(--navy);z-index:10000;display:flex;align-items:center;justify-content:center;transition:opacity .8s cubic-bezier(.77,0,.175,1),visibility .8s}
+.preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+.pre-box{text-align:center}
+.pre-line{width:60px;height:2px;background:linear-gradient(90deg,var(--ruby),var(--lime));transform:scaleX(0);animation:preLine .8s ease .2s forwards}
+.pre-text{font-family:'Space Grotesk',sans-serif;font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--text);margin-top:16px;opacity:0;animation:fadeUp .5s ease .6s forwards}
+@keyframes preLine{to{transform:scaleX(1)}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;transition:all .5s cubic-bezier(.16,1,.3,1)}
+.nav.scrolled{background:rgba(10,14,26,.9);backdrop-filter:blur(40px) saturate(180%);border-bottom:1px solid var(--border)}
+.nav-l{display:flex;align-items:center;gap:28px}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:6px}
+.nav-logo .d{width:7px;height:7px;background:conic-gradient(from 45deg,rgba(255,120,120,.3),rgba(255,220,100,.25),rgba(120,255,120,.2),rgba(120,200,255,.25),rgba(220,120,255,.3));transform:rotate(45deg);box-shadow:0 0 10px rgba(255,255,255,.15),0 0 20px rgba(255,107,44,.1);animation:diamondPrism 3s linear infinite}
+.nav-menu{display:flex;gap:20px}
+.nav-menu a{font-size:.68rem;font-weight:500;color:var(--text);text-decoration:none;letter-spacing:.04em;transition:color .3s;position:relative}
+.nav-menu a:hover{color:var(--white)}
+.nav-menu a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--lime);transition:width .4s cubic-bezier(.16,1,.3,1)}
+.nav-menu a:hover::after{width:100%}
+.nav-r{display:flex;align-items:center;gap:14px}
+.nav-tag{font-family:'JetBrains Mono',monospace;font-size:.42rem;color:rgba(255,107,44,.35);letter-spacing:.18em;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(255,107,44,.1)}
+.nav-cta{padding:7px 18px;background:linear-gradient(135deg,var(--ruby),var(--lime));color:var(--navy);font-size:.65rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;transition:all .3s;font-family:'Space Grotesk',sans-serif;box-shadow:0 0 12px rgba(255,107,44,.2)}
+.nav-cta:hover{box-shadow:0 0 24px rgba(255,107,44,.3);transform:translateY(-1px)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 48px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:120%;object-fit:cover;opacity:.04;will-change:transform}
+.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 25% 50%,rgba(255,107,44,.04) 0%,transparent 50%),radial-gradient(ellipse at 75% 70%,rgba(224,17,95,.03) 0%,transparent 50%)}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(100px);will-change:transform}
+.hero-orb-1{width:500px;height:500px;background:rgba(255,107,44,.04);right:8%;top:20%;animation:orbF 14s ease-in-out infinite}
+.hero-orb-2{width:300px;height:300px;background:rgba(224,17,95,.03);left:20%;bottom:25%;animation:orbF 18s ease-in-out infinite reverse}
+@keyframes orbF{0%,100%{transform:translate(0,0)}33%{transform:translate(20px,-30px)}66%{transform:translate(-15px,20px)}}
+.hero-content{position:relative;z-index:2;max-width:720px}
+        .hero-content::before{content:'';position:absolute;top:-30px;left:-30px;width:20px;height:20px;background:conic-gradient(from 45deg,rgba(255,100,100,.12),rgba(255,200,100,.1),rgba(100,255,100,.08),rgba(100,200,255,.1),rgba(200,100,255,.12));border:1px solid rgba(255,255,255,.1);transform:rotate(45deg);animation:diamondFloat 8s ease-in-out infinite,diamondPrism 5s linear infinite;box-shadow:0 0 12px rgba(255,255,255,.1)}
+        .hero-content::after{content:'';position:absolute;bottom:-20px;right:40px;width:14px;height:14px;background:conic-gradient(from 90deg,rgba(255,100,100,.1),rgba(255,200,100,.08),rgba(100,255,100,.06),rgba(100,200,255,.08),rgba(200,100,255,.1));border:1px solid rgba(255,255,255,.08);transform:rotate(45deg);animation:diamondFloat 10s ease-in-out infinite 2s,diamondPrism 4s linear infinite reverse;box-shadow:0 0 10px rgba(255,255,255,.08)}
+.hero-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--text);letter-spacing:.12em;text-transform:uppercase;margin-bottom:36px;opacity:0;animation:fadeUp .6s ease 2.2s forwards}
+.hero-chip .live{width:6px;height:6px;background:conic-gradient(from 45deg,rgba(255,120,120,.4),rgba(255,220,100,.3),rgba(120,255,120,.25),rgba(120,200,255,.3),rgba(220,120,255,.4));transform:rotate(45deg);animation:lpulse 2s ease infinite,diamondPrism 2s linear infinite}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(3rem,7.5vw,6.5rem);font-weight:700;line-height:.98;letter-spacing:-.04em;margin-bottom:28px}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line span{display:inline-block;transform:translateY(110%);animation:txtUp .8s cubic-bezier(.16,1,.3,1) forwards}
+.hero h1 .line:nth-child(2) span{animation-delay:.1s}
+.hero h1 .line:nth-child(3) span{animation-delay:.2s}
+.hero h1 .lime{color:var(--lime);text-shadow:0 0 40px rgba(255,107,44,.2)}
+.hero h1 .dim{font-weight:300;color:var(--text)}
+.hero-desc{font-size:1.05rem;color:var(--text);max-width:440px;line-height:1.9;font-weight:300;margin-bottom:44px;opacity:0;animation:fadeUp .6s ease .5s forwards}
+.hero-btns{display:flex;gap:12px;align-items:center;opacity:0;animation:fadeUp .6s ease .6s forwards}
+.btn-lime{padding:13px 30px;background:var(--lime);color:var(--navy);font-weight:700;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;transition:all .4s;font-family:'Space Grotesk',sans-serif;border:none;cursor:pointer;position:relative;overflow:hidden}
+.btn-lime::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25),transparent);opacity:0;transition:opacity .3s}
+.btn-lime{background:linear-gradient(135deg,var(--ruby),var(--lime))}
+        .btn-lime:hover{box-shadow:0 4px 32px rgba(255,107,44,.25);transform:translateY(-2px)}.btn-lime:hover::before{opacity:1}
+.btn-ghost{padding:13px 30px;border:1px solid var(--border);color:var(--white);text-decoration:none;font-size:.72rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:all .3s;font-family:'Space Grotesk',sans-serif;background:transparent}
+.btn-ghost:hover{border-color:rgba(255,107,44,.25);color:var(--lime);background:rgba(255,107,44,.02)}
+.hero-metrics{display:flex;gap:48px;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);opacity:0;animation:fadeUp .6s ease .8s forwards}
+.metric .val{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700}
+.metric .val .lime{color:var(--lime)}
+.metric .lbl{font-size:.58rem;color:var(--text);letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
+@keyframes txtUp{to{transform:translateY(0)}}
+@keyframes lpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,107,44,.4)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(255,107,44,0)}}
+        .diamond-deco{position:absolute;width:12px;height:12px;transform:rotate(45deg);pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.05),rgba(255,255,255,.1));border:1px solid rgba(255,255,255,.12);box-shadow:0 0 8px rgba(255,255,255,.08),inset 0 0 4px rgba(255,255,255,.05);animation:diamondFloat 6s ease-in-out infinite,diamondShine 3s ease-in-out infinite}
+        .diamond-deco-sm{width:8px;height:8px}
+        .diamond-float{animation:diamondFloat 6s ease-in-out infinite}
+        @keyframes diamondFloat{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(-10px)}}
+        @keyframes diamondShine{0%,100%{box-shadow:0 0 8px rgba(255,255,255,.08),inset 0 0 4px rgba(255,255,255,.05);filter:brightness(1)}50%{box-shadow:0 0 16px rgba(255,255,255,.2),0 0 32px rgba(255,107,44,.1),inset 0 0 8px rgba(255,255,255,.1);filter:brightness(1.3)}}
+        .diamond-prism{background:conic-gradient(from 0deg,rgba(255,100,100,.15),rgba(255,200,100,.12),rgba(100,255,100,.1),rgba(100,200,255,.12),rgba(200,100,255,.15),rgba(255,100,100,.15));animation:diamondPrism 4s linear infinite}
+        @keyframes diamondPrism{0%{filter:hue-rotate(0deg) brightness(1.1)}100%{filter:hue-rotate(360deg) brightness(1.1)}}
+        .sparkle{position:absolute;width:3px;height:3px;background:var(--white);border-radius:50%;pointer-events:none;animation:sparkle 2s ease-in-out infinite}
+        @keyframes sparkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
+        .diamond-glow{animation:diamondGlow 2.5s ease-in-out infinite}
+        @keyframes diamondGlow{0%,100%{box-shadow:0 0 6px rgba(255,255,255,.1),0 0 12px rgba(255,107,44,.05)}50%{box-shadow:0 0 12px rgba(255,255,255,.25),0 0 24px rgba(255,107,44,.12),0 0 36px rgba(224,17,95,.06)}}
+        .shimmer{background:linear-gradient(135deg,rgba(255,107,44,0) 0%,rgba(224,17,95,.03) 25%,rgba(255,107,44,.06) 50%,rgba(224,17,95,.03) 75%,rgba(255,107,44,0) 100%);background-size:200% 200%;animation:shimmer 4s ease infinite}
+        @keyframes shimmer{0%{background-position:200% 200%}100%{background-position:-200% -200%}}
+@keyframes fireAni{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* SECTIONS */
+.sec{padding:130px 48px}
+.ctn{max-width:1000px;margin:0 auto;width:100%}
+.label{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--lime);letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px;opacity:.5}
+.heading{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,4.5vw,3.4rem);font-weight:700;line-height:1.08;letter-spacing:-.02em;position:relative}
+        .heading::before{content:'◆';font-size:.35em;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b59b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.6;margin-right:10px;vertical-align:middle;filter:drop-shadow(0 0 4px rgba(255,255,255,.15))}
+.heading .lime{color:var(--lime)}
+.subtext{font-size:.95rem;color:var(--text);margin-top:12px;max-width:450px;line-height:1.9;font-weight:300}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(30px);transition:all .85s cubic-bezier(.16,1,.3,1)}
+.rv.d1{transition-delay:.07s}.rv.d2{transition-delay:.14s}.rv.d3{transition-delay:.21s}.rv.d4{transition-delay:.28s}
+.rv.vis{opacity:1;transform:translateY(0)}
+.rvs{opacity:0;transform:scale(.97);transition:all .85s cubic-bezier(.16,1,.3,1)}
+.rvs.vis{opacity:1;transform:scale(1)}
+.rvl{opacity:0;transform:translateX(-30px);transition:all .85s cubic-bezier(.16,1,.3,1)}
+.rvl.vis{opacity:1;transform:translateX(0)}
+.rvr{opacity:0;transform:translateX(30px);transition:all .85s cubic-bezier(.16,1,.3,1)}
+.rvr.vis{opacity:1;transform:translateX(0)}
+
+/* IMAGE REVEAL */
+.img-rv{overflow:hidden;position:relative}
+.img-rv::after{content:'';position:absolute;inset:0;background:var(--navy);transform-origin:left;transition:transform 1.1s cubic-bezier(.77,0,.175,1)}
+.img-rv.vis::after{transform:scaleX(0)}
+.img-rv img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.img-rv.vis img{transform:scale(1)}
+
+/* SERVICES */
+.services{background:var(--navy)}
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:100%}
+.svc-card{background:var(--navy-card);border:1px solid var(--border);padding:40px 30px;transition:all .5s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;cursor:pointer}
+.svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--ruby),var(--lime),transparent);opacity:0;transition:opacity .4s}
+.svc-card::after{content:'';position:absolute;inset:0;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),var(--lime-glow),transparent 40%);opacity:0;transition:opacity .4s;pointer-events:none}.svc-card:hover{border-color:rgba(255,107,44,.12);transform:translateY(-3px)}
+        .svc-card:hover::before,.svc-card:hover::after{opacity:1}
+        .svc-num::after{content:'';display:inline-block;width:4px;height:4px;background:conic-gradient(from 0deg,rgba(255,120,120,.25),rgba(255,220,100,.2),rgba(120,255,120,.15),rgba(120,200,255,.2),rgba(220,120,255,.25));transform:rotate(45deg);margin-left:6px;opacity:.5;animation:diamondPrism 3s linear infinite}
+.svc-num{font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--lime);letter-spacing:.2em;opacity:.35;margin-bottom:18px}
+.svc-card h3{font-family:'Space Grotesk',sans-serif;font-size:1.12rem;font-weight:600;margin-bottom:10px;transition:color .3s}
+.svc-card:hover h3{color:var(--lime)}
+.svc-card p{font-size:.84rem;color:var(--text);line-height:1.8;margin-bottom:16px}
+.svc-price{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--lime);font-size:1.2rem;opacity:.75}
+.svc-price span{font-size:.62rem;color:var(--text);font-weight:400;margin-left:3px}
+
+/* AI */
+.ai{background:var(--navy-light);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ai-card{padding:30px 22px;border:1px solid var(--border);transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,107,44,.03),transparent);opacity:0;transition:opacity .3s}
+.ai-card:hover{border-color:rgba(255,107,44,.1);transform:translateY(-3px)}.ai-card:hover::before{opacity:1}
+.ai-card .ico{font-size:1.4rem;margin-bottom:12px;display:block}
+.ai-card h4{font-family:'Space Grotesk',sans-serif;font-size:.86rem;font-weight:600;margin-bottom:6px}
+.ai-card p{font-size:.76rem;color:var(--text);line-height:1.7}
+
+/* CYBER */
+.cyber{background:var(--navy)}
+.cyber-wrap{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.cyber-visual{position:relative}
+.cyber-badge{position:absolute;bottom:-12px;right:-12px;background:linear-gradient(135deg,var(--ruby),var(--lime));color:var(--navy);padding:12px 18px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;box-shadow:0 6px 24px rgba(255,107,44,.25);z-index:2}
+.cyber-content h3{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;margin-bottom:14px;line-height:1.2}
+.cyber-content h3 .lime{color:var(--lime)}
+.cyber-content>p{color:var(--text);line-height:1.9;margin-bottom:22px}
+.cyber-list{list-style:none}
+.cyber-list li{padding:9px 0;font-size:.84rem;color:var(--text2);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.cyber-list li::before{content:'';width:5px;height:5px;background:conic-gradient(from 0deg,rgba(255,120,120,.3),rgba(255,220,100,.25),rgba(120,255,120,.2),rgba(120,200,255,.25),rgba(220,120,255,.3));transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 6px rgba(255,255,255,.1);animation:diamondPrism 3s linear infinite}
+
+/* PORTFOLIO */
+.portfolio{background:var(--navy-light);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.port-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:100%}
+.port-item{position:relative;overflow:hidden;aspect-ratio:4/3;cursor:pointer;border:1px solid var(--border)}
+.port-item img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.16,1,.3,1),filter .5s;filter:brightness(.55) saturate(.8)}
+.port-item:hover img{transform:scale(1.07);filter:brightness(.75) saturate(1.1)}
+.port-item .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,14,26,.95) 0%,rgba(10,14,26,.2) 40%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px;opacity:0;transition:opacity .4s}
+.port-item:hover .ov{opacity:1}
+.port-item h4{font-family:'Space Grotesk',sans-serif;font-size:.82rem;color:var(--white);margin-bottom:2px;transform:translateY(8px);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.port-item:hover h4{transform:translateY(0)}
+.port-item .ptag{font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--lime);letter-spacing:.12em;text-transform:uppercase;transform:translateY(8px);transition:transform .5s cubic-bezier(.16,1,.3,1) .04s}
+.port-item:hover .ptag{transform:translateY(0)}
+
+/* HORIZONTAL SCROLL */
+.h-scroll-wrap{overflow:hidden;padding:60px 0;max-width:1100px;margin:0 auto}
+.h-scroll-title{padding:0 0;margin-bottom:24px}
+.h-scroll{display:flex;gap:14px;padding:0 48px;width:100%;overflow-x:auto;cursor:grab;user-select:none;scroll-snap-type:x mandatory;-ms-overflow-style:none;scrollbar-width:none}
+.h-scroll::-webkit-scrollbar{display:none}
+.h-scroll:active{cursor:grabbing}
+.h-card{min-width:250px;max-width:280px;flex-shrink:0;padding:32px 22px;border:1px solid var(--border);background:var(--navy-card);transition:all .4s;scroll-snap-align:start}
+.h-card:hover{border-color:rgba(255,107,44,.1);transform:translateY(-3px)}
+.h-card .ico{font-size:1.8rem;margin-bottom:14px}
+.h-card h4{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;margin-bottom:6px}
+.h-card p{font-size:.8rem;color:var(--text);line-height:1.7}
+.h-card .tag{font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--lime);letter-spacing:.15em;text-transform:uppercase;margin-top:14px;opacity:.4}
+
+/* STATS */
+.stats{background:var(--navy);padding:72px 48px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{text-align:center;padding:32px 16px;position:relative}
+.stat-item:not(:last-child)::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:var(--border)}
+.stat-num{font-family:'Space Grotesk',sans-serif;font-size:2.3rem;font-weight:700;margin-bottom:4px}
+.stat-num .lime{color:var(--lime)}
+.stat-lbl{font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--text);letter-spacing:.15em;text-transform:uppercase}
+
+/* PRICING */
+.pricing{background:var(--navy)}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:100%}
+.price-card{background:var(--navy-card);border:1px solid var(--border);padding:40px 24px;transition:all .5s cubic-bezier(.16,1,.3,1);position:relative}
+.price-card:hover{border-color:rgba(255,107,44,.1);transform:translateY(-4px)}
+.price-card.pop{border-color:rgba(255,107,44,.12);background:linear-gradient(180deg,rgba(255,107,44,.03) 0%,rgba(224,17,95,.02) 0%,var(--navy-card) 100%)}
+.price-card.pop::before{content:'★ BEST VALUE';position:absolute;top:-1px;left:0;right:0;background:var(--lime);color:var(--navy);text-align:center;padding:5px;font-family:'JetBrains Mono',monospace;font-size:.42rem;font-weight:700;letter-spacing:.15em}
+.price-card .tier{font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--lime);letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px;opacity:.5}
+.price-card .amt{font-family:'Space Grotesk',sans-serif;font-size:2.4rem;font-weight:700;margin-bottom:4px}
+.price-card .per{font-size:.68rem;color:var(--text);margin-bottom:22px}
+.price-card ul{list-style:none;margin-bottom:24px}
+.price-card li{padding:8px 0;font-size:.78rem;color:var(--text2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.price-card li::before{content:'◆';font-size:.4rem;background:linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b59b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.5;filter:drop-shadow(0 0 2px rgba(255,255,255,.1))}
+.price-card .btn-price{display:block;width:100%;padding:10px;text-align:center;font-weight:600;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:all .4s;border:1px solid var(--border);color:var(--white);background:transparent;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.price-card .btn-price:hover{background:linear-gradient(135deg,var(--ruby),var(--lime));border-color:var(--lime);color:var(--navy);box-shadow:0 4px 20px rgba(255,107,44,.2)}
+.price-card.pop .btn-price{background:var(--lime);border-color:var(--lime);color:var(--navy)}
+.budget-wrap{max-width:460px;margin:44px auto 0;text-align:center}
+.budget-wrap h3{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;margin-bottom:5px}
+.budget-wrap p{color:var(--text);font-size:.76rem;margin-bottom:20px}
+.budget-slider{width:100%;-webkit-appearance:none;height:6px;background:#1a1a1a;outline:none;border-radius:3px}
+.budget-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--silver);border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.2);box-shadow:0 0 10px rgba(192,192,192,.4)}
+.budget-slider::-moz-range-thumb{width:20px;height:20px;background:var(--silver);border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.2)}
+.budget-track{width:100%;height:6px;background:#1a1a1a;border-radius:3px;position:relative;overflow:visible}
+.budget-fill{height:100%;border-radius:3px;transition:width .1s,background .3s;position:absolute;top:0;left:0}
+.budget-range{display:flex;justify-content:space-between;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--text)}
+
+/* TESTIMONIALS */
+.testimonials{background:var(--navy-light);border-top:1px solid var(--border)}
+.test-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.test-card{border:1px solid var(--border);padding:28px;transition:all .4s}
+.test-card:hover{border-color:rgba(255,107,44,.08)}
+.test-card .stars{color:var(--lime);font-size:.72rem;letter-spacing:4px;margin-bottom:12px;opacity:.5}
+.test-card blockquote{font-size:.84rem;line-height:1.9;color:var(--text2);margin-bottom:18px;font-style:italic}
+.test-card .author{display:flex;align-items:center;gap:10px}
+.test-card .avatar{width:28px;height:28px;border:1px solid rgba(170,255,0,.12);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.48rem;color:var(--lime)}
+.test-card .nm{font-weight:600;font-size:.76rem}
+.test-card .rl{font-size:.62rem;color:var(--text)}
+
+/* CTA */
+.cta{background:var(--navy);padding:150px 48px;text-align:center;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(170,255,0,.04) 0%,transparent 70%);filter:blur(60px)}
+.cta h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.5rem,5vw,3.8rem);font-weight:700;margin-bottom:16px;position:relative;letter-spacing:-.02em}
+.cta h2 .lime{color:var(--lime)}
+.cta p{color:var(--text);font-size:.92rem;max-width:380px;margin:0 auto 30px;line-height:1.9;position:relative}
+
+/* CONTACT */
+.contact{background:var(--navy)}
+.contact-split{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+.contact-left h3{font-family:'Space Grotesk',sans-serif;font-size:1.65rem;font-weight:700;margin-bottom:12px;line-height:1.2}
+.contact-left>p{color:var(--text);line-height:1.9;margin-bottom:22px}
+.c-det{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:.78rem;color:var(--text2)}
+.c-det .ico{width:28px;height:28px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0;color:var(--lime)}
+.c-form{display:flex;flex-direction:column;gap:10px}
+.c-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c-form input,.c-form select,.c-form textarea{width:100%;padding:10px 12px;border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--white);font-family:'Inter',sans-serif;font-size:.76rem;transition:border-color .3s;outline:none}
+.c-form input::placeholder,.c-form textarea::placeholder{color:rgba(255,255,255,.1)}
+.c-form input:focus,.c-form select:focus,.c-form textarea:focus{border-color:rgba(255,107,44,.25)}
+.c-form textarea{resize:vertical;min-height:85px}
+.c-form select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23333' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;color:var(--text)}
+.c-form select option{background:var(--navy-card);color:var(--white)}
+
+/* FOOTER */
+footer{background:var(--navy);padding:32px 48px;border-top:1px solid var(--border)}
+.foot-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.foot-brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:5px}
+.foot-brand .d{width:5px;height:5px;background:conic-gradient(from 0deg,rgba(255,120,120,.25),rgba(255,220,100,.2),rgba(120,255,120,.15),rgba(120,200,255,.2),rgba(220,120,255,.25));transform:rotate(45deg);box-shadow:0 0 8px rgba(255,255,255,.12);animation:diamondPrism 4s linear infinite}
+.foot-links{display:flex;gap:16px}
+.foot-links a{color:var(--text);text-decoration:none;font-size:.68rem;transition:color .3s}.foot-links a:hover{color:var(--lime)}
+.foot-bottom{text-align:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);max-width:1100px;margin-left:auto;margin-right:auto}
+.foot-bottom p{color:rgba(255,255,255,.1);font-size:.52rem;font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
+.foot-powered{color:rgba(170,255,0,.18);font-family:'JetBrains Mono',monospace;font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;margin-top:4px}
+
+@media(max-width:1024px){
+    .sec{padding:70px 24px}.nav{padding:0 24px}
+    .svc-grid,.ai-grid,.test-grid{grid-template-columns:1fr;max-width:440px;margin:0 auto}
+    .cyber-wrap{grid-template-columns:1fr;gap:32px}
+    .port-grid{grid-template-columns:repeat(2,1fr)}
+    .price-grid{grid-template-columns:1fr;max-width:340px;margin:0 auto}
+    .price-card.pop{transform:none}.price-card.pop:hover{transform:translateY(-4px)}
+    .stats-row{grid-template-columns:repeat(2,1fr)}.stat-item:nth-child(2)::after{display:none}
+    .contact-split{grid-template-columns:1fr;gap:28px}
+    .foot-inner{flex-direction:column;gap:8px;text-align:center}
+    .c-row{grid-template-columns:1fr}
+    .hero-orb{display:none}.cur,.cur-dot{display:none}.grain{display:none}
+}
+@media(max-width:640px){
+    .hero h1{font-size:2.3rem}
+    .hero-btns{flex-direction:column;align-items:flex-start}
+    .nav-menu{display:none}
+    .port-grid,.stats-row{grid-template-columns:1fr}
+    .hero-metrics{flex-wrap:wrap;gap:14px}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="cur" id="cur"></div>
+<div class="cur-dot" id="curDot"></div>
+
+<div class="preloader" id="preloader">
+    <div class="pre-box"><div style="margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:12px"><svg width="44" height="48" viewBox="0 0 44 48" fill="none"><path d="M22 2L42 14V30C42 38 34 44 22 48C10 44 2 38 2 30V14L22 2Z" stroke="url(#shieldP)" stroke-width="1.5" fill="none"/><path d="M22 8L36 16V28C36 34 30 39 22 42C14 39 8 34 8 28V16L22 8Z" fill="url(#shieldP)" opacity=".06"/><path d="M22 18V32" stroke="url(#shieldP)" stroke-width="1.5" stroke-linecap="round"/><path d="M15 25H29" stroke="url(#shieldP)" stroke-width="1.5" stroke-linecap="round"/><defs><linearGradient id="shieldP" x1="2" y1="2" x2="42" y2="48"><stop offset="0%" stop-color="#E0115F"/><stop offset="50%" stop-color="#FF6B2C"/><stop offset="100%" stop-color="#FFD700"/></linearGradient></defs></svg><span style="font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;background:linear-gradient(135deg,#E0115F,#FF6B2C,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">ONYX</span></div><div class="pre-line"></div><div class="pre-text">Powered by VEX</div></div>
+</div>
+
+<nav class="nav" id="nav">
+    <div class="nav-l">
+        <a href="#" class="nav-logo" style="display:flex;align-items:center;gap:8px"><svg width="22" height="26" viewBox="0 0 44 48" fill="none"><path d="M22 2L42 14V30C42 38 34 44 22 48C10 44 2 38 2 30V14L22 2Z" stroke="url(#shieldN)" stroke-width="2" fill="none"/><path d="M22 18V32" stroke="url(#shieldN)" stroke-width="1.8" stroke-linecap="round"/><path d="M15 25H29" stroke="url(#shieldN)" stroke-width="1.8" stroke-linecap="round"/><defs><linearGradient id="shieldN" x1="2" y1="2" x2="42" y2="48"><stop offset="0%" stop-color="#E0115F"/><stop offset="50%" stop-color="#FF6B2C"/><stop offset="100%" stop-color="#FFD700"/></linearGradient></defs></svg><span>ONYX</span></a>
+        <div class="nav-menu"><a href="#services">Services</a><a href="#ai">AI</a><a href="#cyber">Security</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div>
+    </div>
+    <div class="nav-r">
+        <a href="../vex/" style="font-size:.6rem;color:rgba(255,255,255,.3);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:5px 10px;border:1px solid var(--border);transition:all .3s">← Back to VEX</a>
+        <span class="nav-tag">Powered by VEX</span>
+        <a href="#contact" class="nav-cta">Get Started</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1600&q=80" alt="" id="heroBg"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb" style="width:200px;height:200px;background:rgba(255,69,0,.04);left:40%;top:55%;animation:orbF 12s ease-in-out infinite 3s;filter:blur(80px)"></div>
+    <div class="sparkle" style="top:15%;left:12%;animation-delay:0s"></div>
+    <div class="sparkle" style="top:25%;right:18%;animation-delay:.5s"></div>
+    <div class="sparkle" style="top:60%;left:8%;animation-delay:1s"></div>
+    <div class="sparkle" style="top:70%;right:12%;animation-delay:1.5s"></div>
+    <div class="sparkle" style="top:40%;left:45%;animation-delay:2s"></div>
+    <div class="sparkle" style="top:80%;left:30%;animation-delay:.8s"></div>
+    <div class="sparkle" style="top:20%;left:55%;animation-delay:1.3s"></div>
+    <div class="sparkle" style="top:50%;right:8%;animation-delay:1.8s"></div>
+    <div class="hero-content">
+        <div class="hero-chip"><div class="live"></div>ONYX · AI-Powered Digital Platform</div>
+        <h1>
+            <span class="line"><span>Scale With</span></span>
+            <span class="line"><span class="lime">Intelligence.</span></span>
+            <span class="line"><span class="dim">Not Guesswork.</span></span>
+        </h1>
+        <p class="hero-desc">AI ad campaigns that learn in real-time. Cybersecurity that adapts before threats happen. Built by ONYX.</p>
+        <div class="hero-btns">
+            <a href="#pricing" class="btn-lime">Start Free →</a>
+            <a href="#services" class="btn-ghost">Explore Services</a>
+        </div>
+        <div class="hero-metrics">
+            <div class="metric"><div class="val" data-count="300">0<span class="lime">%</span></div><div class="lbl">Avg ROAS</div></div>
+            <div class="metric"><div class="val" data-count="0">0</div><div class="lbl">Breaches</div></div>
+            <div class="metric"><div class="val" data-count="200">0<span class="lime">+</span></div><div class="lbl">Clients</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec services" id="services" style="position:relative">
+    <div class="ctn">
+        <div class="diamond-deco diamond-float diamond-prism diamond-glow" style="position:absolute;top:30px;right:40px"></div>
+            <div class="diamond-deco diamond-deco-sm diamond-float diamond-glow" style="position:absolute;top:50px;right:80px;animation-delay:1.5s"></div>
+            <div class="sparkle" style="position:absolute;top:35px;right:45px"></div>
+            <div class="sparkle" style="position:absolute;top:55px;right:85px;animation-delay:1s"></div>
+            <div style="margin-bottom:56px">
+            <div class="label rv">What We Do</div>
+            <div class="heading rv d1">What We <span class="lime">Build</span></div>
+            <div class="subtext rv d2">AI-powered services that drive real, measurable results.</div>
+        </div>
+        <div class="svc-grid">
+            <div class="svc-card rv" onmousemove="glow(event,this)"><div class="svc-num">01</div><h3>AI Ad Creation</h3><p>Machine-learning powered ad creatives that outperform human campaigns. AI writes, designs, and optimizes.</p><div class="svc-price">€99+ <span>/ campaign</span></div></div>
+            <div class="svc-card rv d1" onmousemove="glow(event,this)"><div class="svc-num">02</div><h3>Campaign Management</h3><p>Self-learning campaigns optimizing bids, budgets, and creatives 24/7. Real-time A/B testing.</p><div class="svc-price">€299+ <span>/ month</span></div></div>
+            <div class="svc-card rv d2" onmousemove="glow(event,this)"><div class="svc-num">03</div><h3>AI Cybersecurity</h3><p>AI-powered threat detection learning from millions of attack patterns. 24/7 monitoring.</p><div class="svc-price">€199+ <span>/ audit</span></div></div>
+            <div class="svc-card rv d3" onmousemove="glow(event,this)"><div class="svc-num">04</div><h3>AI Video Ads</h3><p>Automated video ad production from script to render. AI handles everything.</p><div class="svc-price">€149+ <span>/ video</span></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec ai" id="ai">
+    <div class="ctn">
+        <div style="text-align:center;margin-bottom:44px">
+            <div class="label rv" style="justify-content:center">AI Arsenal</div>
+            <div class="heading rv d1" style="text-align:center">Our <span class="lime">Engine</span></div>
+        </div>
+        <div class="ai-grid">
+            <div class="ai-card rv"><span class="ico">🧠</span><h4>AI Copywriter</h4><p>GPT-powered ad copy optimized for conversion.</p></div>
+            <div class="ai-card rv d1"><span class="ico">🎨</span><h4>Image Generator</h4><p>Midjourney & DALL-E creatives in seconds.</p></div>
+            <div class="ai-card rv d2"><span class="ico">🎬</span><h4>Video Engine</h4><p>Automated video production, fully AI.</p></div>
+            <div class="ai-card rv d1"><span class="ico">🛡️</span><h4>Threat Shield</h4><p>ML threat detection. Always learning.</p></div>
+            <div class="ai-card rv d2"><span class="ico">📈</span><h4>Analytics</h4><p>Real-time ML insights. Beat competitors.</p></div>
+            <div class="ai-card rv d3"><span class="ico">⚡</span><h4>Auto-Optimize</h4><p>Self-learning campaigns 24/7.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec cyber" id="cyber">
+    <div class="ctn">
+        <div class="cyber-wrap">
+            <div class="cyber-visual rvl"><div class="img-rv"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80" alt="Cybersecurity"></div><div class="cyber-badge">24/7</div></div>
+            <div class="cyber-content rvr">
+                <div class="label">Cybersecurity</div>
+                <h3>Impenetrable<br><span class="lime">Protection</span></h3>
+                <p>AI-powered defenses that learn and adapt. One breach costs millions — we make sure it never happens.</p>
+                <ul class="cyber-list">
+                    <li>Penetration Testing & Vulnerability Assessment</li>
+                    <li>24/7 AI-Powered Threat Monitoring</li>
+                    <li>Incident Response & Digital Forensics</li>
+                    <li>GDPR, ISO 27001, SOC 2 Compliance</li>
+                    <li>Employee Security Training</li>
+                    <li>Cloud & Network Security</li>
+                </ul>
+                <a href="#contact" class="btn-lime" style="margin-top:22px;display:inline-block">Get Protected</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="sec portfolio" id="work">
+    <div class="ctn">
+        <div style="margin-bottom:40px">
+            <div class="label rv">Results</div>
+            <div class="heading rv d1">Campaign <span class="lime">Results</span></div>
+        </div>
+        <div class="port-grid">
+            <div class="port-item rvs"><img src="https://images.unsplash.com/photo-1553729459-uj0gfud0ss3f?w=600&q=80" alt=""><div class="ov"><span class="ptag">E-Commerce</span><h4>300% ROAS</h4></div></div>
+            <div class="port-item rvs d1"><img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&q=80" alt=""><div class="ov"><span class="ptag">SaaS</span><h4>€50K → €200K</h4></div></div>
+            <div class="port-item rvs d2"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80" alt=""><div class="ov"><span class="ptag">Lead Gen</span><h4>10K Leads/Mo</h4></div></div>
+            <div class="port-item rvs d3"><img src="https://images.unsplash.com/photo-1563986768609-322da13575f2?w=600&q=80" alt=""><div class="ov"><span class="ptag">Security</span><h4>0 Breaches</h4></div></div>
+            <div class="port-item rvs"><img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&q=80" alt=""><div class="ov"><span class="ptag">Social</span><h4>€0.02 CPC</h4></div></div>
+            <div class="port-item rvs d1"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt=""><div class="ov"><span class="ptag">Analytics</span><h4>5M Impressions</h4></div></div>
+            <div class="port-item rvs d2"><img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80" alt=""><div class="ov"><span class="ptag">Retail</span><h4>4X Ad Spend</h4></div></div>
+            <div class="port-item rvs d3"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&q=80" alt=""><div class="ov"><span class="ptag">Enterprise</span><h4>Full Overhaul</h4></div></div>
+        </div>
+    </div>
+</section>
+
+<div class="h-scroll-wrap">
+    <div class="h-scroll-title" style="max-width:1100px;margin:0 auto 24px;padding:0 48px">
+        <div class="label rv">Features</div>
+        <div class="heading rv d1">Why <span class="lime">ONYX</span></div>
+    </div>
+    <div class="h-scroll" id="hScroll">
+        <div class="h-card"><div class="ico">🚀</div><h4>Speed</h4><p>AI optimizes every millisecond of performance.</p><div class="tag">Performance</div></div>
+        <div class="h-card"><div class="ico">🔒</div><h4>Security</h4><p>Military-grade protection for digital assets.</p><div class="tag">Cybersecurity</div></div>
+        <div class="h-card"><div class="ico">📊</div><h4>Analytics</h4><p>Real-time dashboards with ML insights.</p><div class="tag">Data</div></div>
+        <div class="h-card"><div class="ico">🎯</div><h4>Targeting</h4><p>AI finds your perfect audience everywhere.</p><div class="tag">Advertising</div></div>
+        <div class="h-card"><div class="ico">⚡</div><h4>Automation</h4><p>Self-learning systems that work while you sleep.</p><div class="tag">AI</div></div>
+        <div class="h-card"><div class="ico">💎</div><h4>Quality</h4><p>Premium results without the premium price.</p><div class="tag">Value</div></div>
+        <div class="h-card"><div class="ico">🌍</div><h4>Global</h4><p>Available worldwide. No borders.</p><div class="tag">Reach</div></div>
+        <div class="h-card"><div class="ico">🤝</div><h4>Support</h4><p>24/7 human + AI support for every client.</p><div class="tag">Service</div></div>
+    </div>
+</div>
+
+<section class="stats">
+    <div class="ctn">
+        <div class="stats-row">
+            <div class="stat-item rv"><div class="stat-num" data-count="300">0<span class="lime">%</span></div><div class="stat-lbl">Avg ROAS</div></div>
+            <div class="stat-item rv d1"><div class="stat-num">0</div><div class="stat-lbl">Breaches</div></div>
+            <div class="stat-item rv d2"><div class="stat-num" data-count="200">0<span class="lime">+</span></div><div class="stat-lbl">Clients</div></div>
+            <div class="stat-item rv d3"><div class="stat-num">24<span class="lime">/7</span></div><div class="stat-lbl">AI Monitoring</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec pricing" id="pricing">
+    <div class="ctn">
+        <div style="margin-bottom:44px">
+            <div class="label rv" style="display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:5px;height:5px;background:var(--lime);transform:rotate(45deg)"></span>Pricing</div>
+            <div class="heading rv d1">Simple <span class="lime">Pricing</span></div>
+        </div>
+        <div class="price-grid"><div class="price-card rv"><div class="tier">Starter</div><div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid var(--border)"><button class="ptab active" onclick="stab(this,'o1m','o1y')" style="flex:1;padding:7px;background:none;border:none;border-bottom:2px solid var(--lime);font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--lime);font-family:'JetBrains Mono',monospace">Monthly</button><button class="ptab" onclick="stab(this,'o1y','o1m')" style="flex:1;padding:7px;background:none;border:none;border-bottom:2px solid transparent;font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace">Yearly <span style="color:#22c55e">-20%</span></button></div><div id="o1m" class="pcon"><div class="amt">€99</div><div class="per">one-time project</div></div><div id="o1y" class="pcon" style="display:none"><div style="text-decoration:line-through;color:var(--text);font-size:.85rem">€99</div><div class="amt" style="color:#22c55e">€79</div><div class="per">save €20</div></div><ul><li>5 AI ad creatives</li><li>AI copywriting</li><li>1 platform</li><li>Audience targeting</li><li>Performance report</li></ul><a href="#contact" class="btn-price">Get Started</a></div><div class="price-card pop rv d1"><div class="tier">Professional</div><div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid var(--border)"><button class="ptab active" onclick="stab(this,'o2m','o2y')" style="flex:1;padding:7px;background:none;border:none;border-bottom:2px solid var(--lime);font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--lime);font-family:'JetBrains Mono',monospace">Monthly</button><button class="ptab" onclick="stab(this,'o2y','o2m')" style="flex:1;padding:7px;background:none;border:none;border-bottom:2px solid transparent;font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace">Yearly <span style="color:#22c55e">-25%</span></button></div><div id="o2m" class="pcon"><div class="amt">€499</div><div class="per">monthly retainer</div></div><div id="o2y" class="pcon" style="display:none"><div style="text-decoration:line-through;color:var(--text);font-size:.85rem">€499</div><div class="amt" style="color:#22c55e">€375</div><div class="per">save €124/mo</div></div><ul><li>Unlimited AI creatives</li><li>AI video ads</li><li>Multi-platform</li><li>AI A/B testing</li><li>Cybersecurity audit</li><li>24/7 monitoring</li><li>Weekly reports</li></ul><a href="#contact" class="btn-price">Get Started</a></div><div class="price-card rv d2"><div class="tier">Enterprise</div><div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid var(--border)"><button class="ptab active" onclick="stab(this,'o3m','o3y')" style="flex:1;padding:7px;background:none;border:none;border-bottom:2px solid var(--lime);font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--lime);font-family:'JetBrains Mono',monospace">Monthly</button><button class="ptab" onclick="stab(this,'o3y','o3m')" style="flex:1;padding:7px;background:none;border:none;border-bottom:2px solid transparent;font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace">Yearly <span style="color:#22c55e">-30%</span></button></div><div id="o3m" class="pcon"><div class="amt">€1,499</div><div class="per">full deployment</div></div><div id="o3y" class="pcon" style="display:none"><div style="text-decoration:line-through;color:var(--text);font-size:.85rem">€1,499</div><div class="amt" style="color:#22c55e">€1,049</div><div class="per">save €450</div></div><ul><li>Everything in Pro</li><li>Full cybersecurity suite</li><li>24/7 threat monitoring</li><li>Pen testing</li><li>Compliance</li><li>Custom AI models</li><li>Dedicated manager</li></ul><a href="#contact" class="btn-price">Get Started</a></div>
+        </div>
+        <div class="budget-wrap rv">
+            <h3>Set Your Budget</h3>
+            <p>Slide to explore what's possible</p>
+            <div class="budget-track" style="position:relative;margin:20px 0">
+                <div class="budget-fill" id="budgetFill" style="width:1%;background:#C0C0C0"></div>
+                <input type="range" class="budget-slider" id="budgetSlider" min="49" max="30000" value="499" step="50" style="position:relative;z-index:2;background:transparent">
+            </div>
+            <div id="budgetDisplay" style="font-family:'Space Grotesk',sans-serif;font-size:2.8rem;font-weight:700;color:var(--lime);margin-top:24px">€499</div>
+            <div id="budgetMsg" style="min-height:24px;margin-top:8px;font-size:.85rem;font-weight:600;transition:color .3s"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:.6rem;color:var(--text);font-family:'JetBrains Mono',monospace"><span>€49</span><span>€30,000</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec testimonials">
+    <div class="ctn">
+        <div style="margin-bottom:44px">
+            <div class="label rv" style="display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:5px;height:5px;background:var(--lime);transform:rotate(45deg)"></span>Reviews</div>
+            <div class="heading rv d1">Client <span class="lime">Results</span></div>
+        </div>
+        <div class="test-grid">
+            <div class="test-card rv"><div class="stars">★ ★ ★ ★ ★</div><blockquote>"Ad costs dropped 60%, conversions tripled. The AI system is a machine."</blockquote><div class="author"><div class="avatar">MK</div><div><div class="nm">Marco K.</div><div class="rl">E-commerce Owner</div></div></div></div>
+            <div class="test-card rv d1"><div class="stars">★ ★ ★ ★ ★</div><blockquote>"Found 47 vulnerabilities our previous team missed. AI monitoring is next level."</blockquote><div class="author"><div class="avatar">SB</div><div><div class="nm">Sarah B.</div><div class="rl">CTO, FinTech</div></div></div></div>
+            <div class="test-card rv d1"><div class="stars">★ ★ ★ ★ ★</div><blockquote>"€99 turned into €6K revenue in month one. ROI is insane."</blockquote><div class="author"><div class="avatar">JD</div><div><div class="nm">Jean D.</div><div class="rl">Agency Founder</div></div></div></div>
+            <div class="test-card rv d2"><div class="stars">★ ★ ★ ★ ★</div><blockquote>"AI ads + cybersecurity under one roof. Best value agency. Powered by VEX."</blockquote><div class="author"><div class="avatar">AL</div><div><div class="nm">Anna L.</div><div class="rl">Marketing Director</div></div></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="cta" style="position:relative">
+    <div class="diamond-deco diamond-float diamond-prism diamond-glow" style="top:40px;left:20%"></div>
+    <div class="diamond-deco diamond-deco-sm diamond-float diamond-glow" style="top:60px;right:25%;animation-delay:1s"></div>
+    <div class="diamond-deco diamond-float diamond-prism diamond-glow" style="bottom:50px;left:35%;animation-delay:3s"></div>
+    <div class="diamond-deco diamond-deco-sm diamond-float diamond-glow" style="bottom:70px;right:15%;animation-delay:2s"></div>
+    <div class="sparkle" style="top:45px;left:22%"></div>
+    <div class="sparkle" style="top:55px;right:27%;animation-delay:.7s"></div>
+    <div class="sparkle" style="bottom:55px;left:37%;animation-delay:1.4s"></div>
+    <div class="sparkle" style="bottom:65px;right:17%;animation-delay:2.1s"></div>
+    <h2>Ready to<br><span class="lime">Dominate</span>?</h2>
+    <p>AI-powered growth. Bulletproof security. One platform. Powered by VEX.</p>
+    <a href="#contact" class="btn-lime">Start Free →</a>
+</section>
+
+<section class="sec contact" id="contact" style="position:relative">
+    <div class="ctn">
+        <div class="diamond-deco diamond-float diamond-prism diamond-glow" style="position:absolute;top:40px;right:60px"></div>
+            <div class="diamond-deco diamond-deco-sm diamond-float diamond-glow" style="position:absolute;bottom:30px;left:40px;animation-delay:2s"></div>
+            <div class="sparkle" style="position:absolute;top:45px;right:65px"></div>
+            <div class="sparkle" style="position:absolute;bottom:35px;left:45px;animation-delay:1.2s"></div>
+            <div class="contact-split">
+            <div class="contact-left rv">
+                <div class="label">Contact</div>
+                <h3>Let's build<br>something smart.</h3>
+                <p>Tell us about your business. We'll build a custom AI strategy.</p>
+                <div class="c-det"><div class="ico">✉</div><span>hello@nexusai.eu</span></div>
+                <div class="c-det"><div class="ico">💬</div><span>Discord: NexusAI</span></div>
+                <div class="c-det"><div class="ico">📍</div><span>Available Worldwide</span></div>
+            </div>
+            <form class="c-form rv d1" onsubmit="send(event)">
+                <div class="c-row"><input type="text" placeholder="Name" required><input type="email" placeholder="Email" required></div>
+                <select required><option value="" disabled selected>Service</option><option>AI Ad Creation</option><option>Campaign Management</option><option>AI Video Ads</option><option>Cybersecurity Audit</option><option>Threat Protection</option><option>Full Package</option></select>
+                <select id="budgetSelect"><option value="" disabled selected>Budget</option><option>€49</option><option>€75</option><option>€99</option><option>€149</option><option>€199</option><option>€299</option><option>€399</option><option>€499</option><option>€799</option><option>€1,499</option></select>
+                <textarea placeholder="Tell us about your project..." required></textarea>
+                <button type="submit" class="btn-lime" style="width:100%;text-align:center">Send →</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="foot-inner">
+        <div class="foot-brand" style="display:flex;align-items:center;gap:8px"><svg width="18" height="20" viewBox="0 0 44 48" fill="none"><path d="M22 2L42 14V30C42 38 34 44 22 48C10 44 2 38 2 30V14L22 2Z" stroke="rgba(192,192,192,.4)" stroke-width="1.8" fill="none"/><path d="M22 18V32" stroke="rgba(192,192,192,.3)" stroke-width="1.2" stroke-linecap="round"/><path d="M15 25H29" stroke="rgba(192,192,192,.3)" stroke-width="1.2" stroke-linecap="round"/></svg>ONYX</div>
+        <div class="foot-links"><a href="#services">Services</a><a href="#ai">AI Engine</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a><a href="../vex/" style="color:rgba(192,192,192,.4)">← VEX</a></div>
+    </div>
+    <div class="foot-bottom"><p>© 2026 ONYX. All rights reserved.</p><div class="foot-powered">Powered by VEX</div></div>
+</footer>
+
+<script>
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('preloader').classList.add('done'),2000));
+
+// Cursor
+const c=document.getElementById('cur'),cd=document.getElementById('curDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function l(){cx+=(mx-cx)*.12;cy+=(my-cy)*.12;c.style.left=cx+'px';c.style.top=cy+'px';cd.style.left=mx+'px';cd.style.top=my+'px';requestAnimationFrame(l)})();
+document.querySelectorAll('a,.svc-card,.ai-card,.port-item,.btn-lime,.btn-ghost,.btn-price,.h-card,.test-card').forEach(el=>{el.addEventListener('mouseenter',()=>c.classList.add('hover'));el.addEventListener('mouseleave',()=>c.classList.remove('hover'))});
+
+// Nav
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>50));
+
+// Reveal
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -20px 0px'});
+document.querySelectorAll('.rv,.rvs,.rvl,.rvr,.img-rv').forEach(el=>obs.observe(el));
+
+// Counter
+const cObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){const el=x.target,t=parseInt(el.dataset.count);if(isNaN(t))return;let cv=0;const s=Math.ceil(t/30);const i=setInterval(()=>{cv+=s;if(cv>=t){cv=t;clearInterval(i)}el.innerHTML=cv+(el.innerHTML.includes('%')?'<span class="lime">%</span>':el.innerHTML.includes('+')?'<span class="lime">+</span>':'')},25);cObs.unobserve(el)}})},{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>cObs.observe(el));
+
+// Glow
+function glow(e,card){const r=card.getBoundingClientRect();card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')}
+
+// Budget Slider
+var sl=document.getElementById('budgetSlider');
+var dp=document.getElementById('budgetDisplay');
+var bm=document.getElementById('budgetMsg');
+var fill=document.getElementById('budgetFill');
+
+function getColor(v){
+    if(v<=500) return {fill:'#C0C0C0',text:'#C0C0C0',msg:'Silver tier — basic package'};
+    if(v<=1000){var p1=(v-500)/500;var r1=Math.round(192+p1*60);var g1=Math.round(192-p1*100);var b1=Math.round(192-p1*110);return {fill:'rgb('+r1+','+g1+','+b1+')',text:'rgb('+r1+','+g1+','+b1+')',msg:'Getting warmer...'};}
+    if(v<=5000){var p2=(v-1000)/4000;var r2=Math.round(252-p2*5);var g2=Math.round(92-p2*55);var b2=Math.round(82-p2*60);return {fill:'rgb('+r2+','+g2+','+b2+')',text:'rgb('+r2+','+g2+','+b2+')',msg:'🔥 Hot tier — premium features'};}
+    if(v<=10000) return {fill:'#ff4500',text:'#ff4500',msg:'🔥🔥 PREMIUM — everything included'};
+    return {fill:'#ff0000',text:'#ff0000',msg:'💎💎💎 ULTRA — we go beyond everything'};
+}
+
+sl.addEventListener('input',function(){
+    var v=parseInt(this.value);
+    var c=getColor(v);
+    dp.textContent='\u20AC'+v.toLocaleString();
+    dp.style.color=c.text;
+    fill.style.width=(((v-49)/(30000-49))*100)+'%';
+    fill.style.background=c.fill;
+    this.style.background='#1a1a1a';
+    bm.innerHTML=c.msg;
+    bm.style.color=c.text;
+});
+sl.dispatchEvent(new Event('input'));
+
+// Form
+function send(e){e.preventDefault();const b=e.target.querySelector('button');b.textContent='✓ SENT';b.style.background='linear-gradient(135deg,#E0115F,#FF6B2C)';b.style.color='#0A0E1A';setTimeout(()=>{b.textContent='Send →';b.style.background='';b.style.color='';e.target.reset()},3000)}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+
+// Parallax
+window.addEventListener('scroll',()=>{const bg=document.getElementById('heroBg');if(bg)bg.style.transform='translateY('+window.scrollY*.1+'px)'});
+
+// Horizontal scroll
+const hs=document.getElementById('hScroll');
+let hDown=false,hSx,hSl;
+hs.addEventListener('mousedown',e=>{hDown=true;hSx=e.pageX-hs.offsetLeft;hSl=hs.scrollLeft});
+hs.addEventListener('mouseleave',()=>hDown=false);
+hs.addEventListener('mouseup',()=>hDown=false);
+hs.addEventListener('mousemove',e=>{if(!hDown)return;e.preventDefault();hs.scrollLeft=hSx-(e.pageX-hs.offsetLeft)*1.5});
+hs.style.scrollbarWidth='none';hs.style.msOverflowStyle='none';
+
+// Price tabs
+function stab(btn,showId,hideId){
+    const show=document.getElementById(showId),hide=document.getElementById(hideId);
+    if(show)show.style.display='block';
+    if(hide)hide.style.display='none';
+    const tabs=btn.parentElement.querySelectorAll('.ptab');
+    tabs.forEach(t=>{t.style.borderBottomColor='transparent';t.style.color='var(--text)'});
+    btn.style.borderBottomColor='var(--lime)';
+    btn.style.color='var(--lime)';
+}
+// Hide scrollbar on h-scroll
+hs.addEventListener('touchmove',()=>{}, {passive:true});
+</script>
+</body>
+</html>
